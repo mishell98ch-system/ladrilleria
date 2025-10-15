@@ -1,0 +1,3613 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Ladrillería</title>
+    <style>
+        :root {
+            --primary-color: #8B1538;
+            --primary-dark: #6B0F2A;
+            --primary-light: #A72848;
+            --accent-color: #C4314B;
+            --bg-light: #FAF6F7;
+            --bg-gray: #F5F5F5;
+            --text-dark: #2C2C2C;
+            --text-light: #FFFFFF;
+            --border-color: #D4A5A5;
+            --shadow: 0 2px 8px rgba(139, 21, 56, 0.15);
+            --shadow-hover: 0 4px 12px rgba(139, 21, 56, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-gray) 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: var(--text-light);
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            position: relative;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-logo {
+            max-height: 80px;
+            width: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-text {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .header-logo {
+                max-height: 60px;
+            }
+            
+            .header-text {
+                font-size: 20px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .header-logo {
+                max-height: 50px;
+            }
+            
+            .header-text {
+                font-size: 18px;
+            }
+        }
+
+        .content {
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .menu-button, .choice-button {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .menu-button:hover, .choice-button:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .choice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .choice-grid.days {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+        }
+
+        .form-group input:read-only {
+            background-color: var(--bg-light);
+            cursor: not-allowed;
+        }
+
+        .price-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .price-box {
+            border: 2px solid var(--primary-light);
+            padding: 15px;
+            border-radius: 8px;
+            background: var(--bg-light);
+        }
+
+        .price-box h4 {
+            margin-top: 0;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .radio-group {
+            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .radio-group input[type="radio"] {
+            margin-right: 5px;
+            cursor: pointer;
+        }
+
+        .bottom-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .action-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .action-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .back-button {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        .order-item {
+            background-color: var(--bg-light);
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .order-item h4 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .search-filters {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-light) 0%, white 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            gap: 8px;
+        }
+
+        .filter-row label {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        .filter-row select {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-row select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 12px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .results-table thead,
+        .results-table tbody {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .results-table th,
+        .results-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .results-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .results-table tbody tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+
+        .results-table tbody tr:hover {
+            background-color: #FFE4EC;
+        }
+
+        .delete-button {
+            background-color: #DC3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .delete-button:hover {
+            background-color: #C82333;
+            transform: scale(1.05);
+        }
+
+        .results-summary {
+            margin: 15px 0;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+        .weekly-report {
+            padding: 15px;
+        }
+
+        .report-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+
+        .report-summary {
+            margin-bottom: 30px;
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+        }
+
+        .report-summary div {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .report-summary strong {
+            display: inline-block;
+            min-width: 180px;
+            color: var(--primary-color);
+        }
+
+        .chofer-section {
+            margin-bottom: 20px;
+        }
+
+        .chofer-title {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        .report-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 15px;
+        }
+
+        .view-orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .view-orders-table thead,
+        .view-orders-table tbody {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .view-orders-table th,
+        .view-orders-table td {
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            text-align: center;
+        }
+
+        .view-orders-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        .orders-viewer {
+            padding: 15px;
+        }
+
+        .orders-viewer h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .orders-viewer h4 {
+            color: var(--primary-color);
+            margin-top: 30px;
+        }
+
+        .top-right-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .gastos-form {
+            margin-top: 20px;
+        }
+
+        .gastos-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gastos-group label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .gastos-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .gastos-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+        }
+
+        .gastos-textarea {
+            width: 100%;
+            max-width: 400px;
+            height: 80px;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            resize: vertical;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .gastos-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 21, 56, 0.1);
+        }
+
+        .gastos-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* Estilos para impresión */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .printable-report, .printable-report * {
+                visibility: visible;
+            }
+            .printable-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+            }
+            .printable-report .no-print {
+                display: none;
+            }
+            .printable-report table {
+                border-collapse: collapse;
+                width: 100%;
+                font-size: 12px;
+            }
+            .printable-report th,
+            .printable-report td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: left;
+            }
+            .printable-report th {
+                background-color: #f0f0f0;
+                font-weight: bold;
+            }
+        }
+
+        /* Responsive Design - Tablets */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                font-size: 20px;
+                padding: 15px 10px;
+            }
+
+            .back-button {
+                right: 10px;
+                padding: 6px 10px;
+                font-size: 16px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .menu-buttons {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .choice-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .choice-grid.days {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-group input, 
+            .form-group select,
+            .gastos-input,
+            .gastos-textarea {
+                max-width: 100%;
+            }
+
+            .price-section {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+            }
+
+            .report-summary strong {
+                min-width: 140px;
+                font-size: 13px;
+            }
+
+            .report-title {
+                font-size: 20px;
+            }
+
+            .results-table,
+            .view-orders-table {
+                font-size: 10px;
+            }
+
+            .results-table th,
+            .results-table td,
+            .view-orders-table th,
+            .view-orders-table td {
+                padding: 4px 2px;
+            }
+
+            .report-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Responsive Design - Mobile */
+        @media screen and (max-width: 480px) {
+            .header {
+                font-size: 18px;
+                padding: 12px 8px;
+            }
+
+            .back-button {
+                right: 5px;
+                padding: 4px 8px;
+                font-size: 14px;
+            }
+
+            .content {
+                padding: 10px;
+            }
+
+            .menu-button, .choice-button {
+                padding: 15px;
+                font-size: 14px;
+            }
+
+            .choice-grid.days {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group label,
+            .gastos-group label,
+            .filter-row label {
+                font-size: 13px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .gastos-input,
+            .gastos-textarea,
+            .filter-row select {
+                font-size: 13px;
+                padding: 8px;
+            }
+
+            .action-button {
+                padding: 10px 20px;
+                font-size: 13px;
+            }
+
+            .report-title {
+                font-size: 18px;
+            }
+
+            .report-summary {
+                padding: 15px;
+            }
+
+            .report-summary div {
+                font-size: 13px;
+            }
+
+            .report-summary strong {
+                display: block;
+                min-width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .results-table,
+            .view-orders-table {
+                font-size: 9px;
+            }
+
+            .results-table th,
+            .results-table td,
+            .view-orders-table th,
+            .view-orders-table td {
+                padding: 3px 1px;
+            }
+
+            .delete-button {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            /* Hacer tablas scrolleables horizontalmente en mobile */
+            #search-results-table,
+            #weekly-report-table {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        /* Mejoras para pantallas muy pequeñas */
+        @media screen and (max-width: 360px) {
+            .header {
+                font-size: 16px;
+            }
+
+            .menu-button, .choice-button {
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla Principal -->
+    <div class="container screen active" id="main-menu">
+        <div class="header">
+            <img src="logo.png" alt="LADRILLOS AREQUIPA S.A.C." class="header-logo" 
+                 onload="console.log('Logo principal cargado')" 
+                 onerror="console.log('Error cargando logo principal'); this.style.display='none'; this.nextElementSibling.style.marginLeft='0'">
+            <div class="header-text">
+                Sistema de Ladrillería
+                <div style="font-size: 14px; font-weight: normal; margin-top: 5px; font-style: italic;">
+                    "De su tierra para su gente"
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="menu-buttons">
+                <button class="menu-button" onclick="showScreen('chofer-selection')">Pedidos</button>
+                <button class="menu-button" onclick="showScreen('report-selection')">Reportes</button>
+                <button class="menu-button" onclick="showScreen('search')">Buscar</button>
+                <button class="menu-button" onclick="showScreen('export-data')">📥 Exportar Datos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de Tipo de Reporte -->
+    <div class="container screen" id="report-selection">
+        <div class="header">
+            <img src="logo.png" alt="LADRILLOS AREQUIPA S.A.C." class="header-logo" onerror="this.style.display='none'">
+            <div class="header-text">
+                Selecciona el Tipo de Reporte
+            </div>
+            <button class="back-button" onclick="showScreen('main-menu')">×</button>
+        </div>
+        <div class="content">
+            <div class="choice-grid">
+                <button class="choice-button" onclick="showScreen('reports')">Reporte General</button>
+                <button class="choice-button" onclick="showScreen('report-by-vendor')">Reporte por Vendedor</button>
+                <button class="choice-button" onclick="showScreen('report-by-week-filter')">Reporte por Semana</button>
+                <button class="choice-button" onclick="showScreen('report-by-month-filter')">Reporte por Mes</button>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-button" onclick="showScreen('main-menu')">Volver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de Chofer -->
+    <div class="container screen" id="chofer-selection">
+        <div class="header">
+            <img src="logo.png" alt="LADRILLOS AREQUIPA S.A.C." class="header-logo" onerror="this.style.display='none'">
+            <div class="header-text">
+                Selecciona el Chofer
+            </div>
+            <button class="back-button" onclick="showScreen('main-menu')">×</button>
+        </div>
+        <div class="content">
+            <div class="choice-grid">
+                <button class="choice-button" onclick="selectChofer('Chofer 1')">Chofer 1</button>
+                <button class="choice-button" onclick="selectChofer('Chofer 2')">Chofer 2</button>
+                <button class="choice-button" onclick="selectChofer('Chofer 3')">Chofer 3</button>
+                <button class="choice-button" onclick="selectChofer('Chofer 4')">Chofer 4</button>
+                <button class="choice-button" onclick="selectChofer('Chofer 5')">Chofer 5</button>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-button" onclick="showScreen('main-menu')">Volver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selección de Día -->
+    <div class="container screen" id="day-selection">
+        <div class="header">
+            Pedidos por Día
+            <button class="back-button" onclick="showScreen('chofer-selection')">×</button>
+        </div>
+        <div class="content">
+            <div class="choice-grid days">
+                <button class="choice-button" onclick="selectDay('LUNES')">LUNES</button>
+                <button class="choice-button" onclick="selectDay('MARTES')">MARTES</button>
+                <button class="choice-button" onclick="selectDay('MIERCOLES')">MIÉRCOLES</button>
+                <button class="choice-button" onclick="selectDay('JUEVES')">JUEVES</button>
+                <button class="choice-button" onclick="selectDay('VIERNES')">VIERNES</button>
+                <button class="choice-button" onclick="selectDay('SABADO')">SÁBADO</button>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-button" onclick="showScreen('main-menu')">Volver al menú</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Pedido -->
+    <div class="container screen" id="order-form">
+        <div class="header">
+            <span id="order-title">Pedido</span>
+            <button class="back-button" onclick="showScreen('day-selection')">×</button>
+        </div>
+        <div class="content">
+            <div class="form-group">
+                <label>Cantidad:</label>
+                <input type="number" id="cantidad" placeholder="Ingrese cantidad" oninput="calculateTotal()">
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de Ladrillo:</label>
+                <select id="tipo-ladrillo" onchange="updatePriceFields()">
+                    <option value="">Seleccione tipo</option>
+                    <option value="H-10 ECO">H-10 ECO</option>
+                    <option value="H-10 COM">H-10 COM</option>
+                    <option value="H-10 SEG">H-10 SEG</option>
+                    <option value="PAND ECO">PAND ECO</option>
+                    <option value="PAND COM">PAND COM</option>
+                    <option value="PAND SEG">PAND SEG</option>
+                    <option value="H-09 ECO">H-09 ECO</option>
+                    <option value="H-09 COM">H-09 COM</option>
+                    <option value="H-09 SEG">H-09 SEG</option>
+                    <option value="H-15">H-15</option>
+                    <option value="H-15 SEG">H-15 SEG</option>
+                    <option value="H-12">H-12</option>
+                    <option value="H-12 SEG">H-12 SEG</option>
+                    <option value="H-20">H-20</option>
+                </select>
+            </div>
+
+            <div class="price-section" id="price-section">
+                <div class="price-box" id="price-box-single" style="display: none;">
+                    <h4>Precio por Unidad</h4>
+                    <input type="number" id="precio-unidad" step="0.01" style="width: 100%;" oninput="calculateTotal()">
+                </div>
+                <div class="price-box" id="price-box-millar" style="display: none;">
+                    <h4>Precio por Millar</h4>
+                    <input type="number" id="precio-millar" step="0.01" style="width: 100%;" oninput="calculateTotal()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Total:</label>
+                <input type="number" id="total" step="0.01" readonly style="background-color: #f0f0f0;">
+            </div>
+
+            <div class="form-group">
+                <label>Forma de Pago:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="forma-pago" value="Deposito" onchange="togglePaymentFields()"> Depósito</label>
+                    <label><input type="radio" name="forma-pago" value="Efectivo" onchange="togglePaymentFields()"> Efectivo</label>
+                </div>
+            </div>
+
+            <div class="form-group" id="num-operacion-group" style="display: none;">
+                <label>N° de Operación:</label>
+                <input type="text" id="num-operacion">
+            </div>
+
+            <div class="form-group">
+                <label>Total:</label>
+                <input type="number" id="total-final" step="0.01" readonly style="background-color: #f0f0f0;">
+            </div>
+
+            <div class="form-group">
+                <label>Fábrica:</label>
+                <select id="fabrica">
+                    <option value="">Seleccione fábrica</option>
+                    <option value="Ladrillera Arequipa">Ladrillera Arequipa</option>
+                    <option value="Ladrillera Choque">Ladrillera Choque</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Vendedor:</label>
+                <select id="vendedor">
+                    <option value="">Seleccione vendedor</option>
+                    <option value="Vicente">Vicente</option>
+                    <option value="Susan">Susan</option>
+                    <option value="Of.de Cono Norte">Of.de Cono Norte</option>
+                </select>
+            </div>
+
+            <div class="bottom-buttons">
+                <button class="action-button" onclick="saveOrder()">Guardar Pedido</button>
+                <button class="action-button" onclick="showGastosForm()">Ingresar Gastos</button>
+                <button class="action-button" onclick="showScreen('day-selection')">Salir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Búsqueda -->
+    <div class="container screen" id="search">
+        <div class="header">
+            Buscador
+            <button class="back-button" onclick="showScreen('main-menu')">×</button>
+        </div>
+        <div class="content">
+            <div class="search-filters">
+                <div class="filter-row">
+                    <label>Seleccionar el Chofer:</label>
+                    <select id="search-chofer">
+                        <option value="">Todos los choferes</option>
+                        <option value="Chofer 1">Chofer 1</option>
+                        <option value="Chofer 2">Chofer 2</option>
+                        <option value="Chofer 3">Chofer 3</option>
+                        <option value="Chofer 4">Chofer 4</option>
+                        <option value="Chofer 5">Chofer 5</option>
+                    </select>
+                </div>
+
+                <div class="filter-row">
+                    <label>Seleccionar Dia:</label>
+                    <select id="search-dia">
+                        <option value="">Todos los días</option>
+                        <option value="LUNES">LUNES</option>
+                        <option value="MARTES">MARTES</option>
+                        <option value="MIÉRCOLES">MIÉRCOLES</option>
+                        <option value="JUEVES">JUEVES</option>
+                        <option value="VIERNES">VIERNES</option>
+                        <option value="SÁBADO">SÁBADO</option>
+                    </select>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="action-button" onclick="performSearch()">Buscar</button>
+                </div>
+            </div>
+
+            <div id="search-results-summary" class="results-summary" style="display: none;"></div>
+
+            <div id="search-results-table" style="display: none; overflow-x: auto;">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cantidad</th>
+                            <th>Tipo Ladrillo</th>
+                            <th>Fábrica</th>
+                            <th>Chofer</th>
+                            <th>Día</th>
+                            <th>Precio Unit.</th>
+                            <th>Precio Millar</th>
+                            <th>Total</th>
+                            <th>Forma Pago</th>
+                            <th>N° Operación</th>
+                            <th>Vendedor</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="search-results-tbody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-button" onclick="showScreen('main-menu')">SALIR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Exportar Datos -->
+    <div class="container screen" id="export-data">
+        <div class="header">
+            <img src="logo.png" alt="LADRILLOS AREQUIPA S.A.C." class="header-logo" onerror="this.style.display='none'">
+            <div class="header-text">
+                Exportar Datos
+            </div>
+            <button class="back-button" onclick="showScreen('main-menu')">×</button>
+        </div>
+        <div class="content">
+            <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #4CAF50;">
+                <h3 style="margin-top: 0; color: #2e7d32;">✅ Forma Súper Simple</h3>
+                <p style="font-size: 15px; line-height: 1.6; margin: 10px 0;">
+                    1. Haz clic en el botón de abajo para descargar<br>
+                    2. Abre <a href="https://sheets.google.com" target="_blank" style="color: #2e7d32; font-weight: bold;">Google Sheets</a><br>
+                    3. Ve a <strong>Archivo → Importar → Subir</strong><br>
+                    4. Selecciona el archivo descargado<br>
+                    5. ¡Listo! Ya tienes tus datos en la nube 🎉
+                </p>
+            </div>
+
+            <div style="background: var(--bg-light); padding: 30px; border-radius: 8px; margin: 20px 0; border: 2px solid var(--border-color);">
+                <h3 style="margin-top: 0; color: var(--primary-color); text-align: center;">📥 Descargar Datos</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📦</div>
+                        <h4 style="color: var(--primary-color); margin: 10px 0;">Pedidos</h4>
+                        <p style="color: #666; font-size: 14px; margin: 10px 0;">
+                            <span id="export-orders-count" style="font-weight: bold; color: var(--primary-color);">0</span> pedidos
+                        </p>
+                        <button class="action-button" onclick="exportPedidosToExcel()" style="width: 100%; margin-top: 15px;">
+                            📊 Descargar Excel
+                        </button>
+                    </div>
+
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">💰</div>
+                        <h4 style="color: var(--primary-color); margin: 10px 0;">Gastos</h4>
+                        <p style="color: #666; font-size: 14px; margin: 10px 0;">
+                            <span id="export-gastos-count" style="font-weight: bold; color: var(--primary-color);">0</span> gastos
+                        </p>
+                        <button class="action-button" onclick="exportGastosToExcel()" style="width: 100%; margin-top: 15px;">
+                            📊 Descargar Excel
+                        </button>
+                    </div>
+
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 8px; box-shadow: var(--shadow);">
+                        <div style="font-size: 48px; margin-bottom: 15px;">📋</div>
+                        <h4 style="color: var(--primary-color); margin: 10px 0;">Todo Junto</h4>
+                        <p style="color: #666; font-size: 14px; margin: 10px 0;">
+                            Pedidos + Gastos
+                        </p>
+                        <button class="action-button" onclick="exportAllToExcel()" style="width: 100%; margin-top: 15px; background: #FF6B35;">
+                            📊 Descargar Todo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="export-status" style="margin: 20px 0; padding: 15px; border-radius: 6px; display: none;"></div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-button" onclick="showScreen('main-menu')">Volver al Menú</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Sincronización en la Nube -->
+    <div class="container screen" id="cloud-sync">
+        <div class="header">
+            <img src="logo.png" alt="LADRILLOS AREQUIPA S.A.C." class="header-logo" onerror="this.style.display='none'">
+            <div class="header-text">
+                ☁️ Sincronización en la Nube
+            </div>
+            <button class="back-button" onclick="showScreen('main-menu')">×</button>
+        </div>
+        <div class="content">
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
+                <h3 style="margin-top: 0; color: #1565C0;">🚀 Accede desde Cualquier Dispositivo</h3>
+                <p style="font-size: 15px; line-height: 1.6; margin: 10px 0; color: #333;">
+                    Configura Firebase (gratis) y tus datos se sincronizarán automáticamente en la nube.<br>
+                    Podrás acceder desde tu <strong>celular, tablet o cualquier computadora</strong>.
+                </p>
+            </div>
+
+            <!-- Estado de Configuración -->
+            <div id="firebase-config-status" style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #ffc107;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 48px;">⚙️</div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 5px 0; color: #856404;">Estado: <span id="firebase-status-text">No Configurado</span></h4>
+                        <p style="margin: 0; color: #666; font-size: 14px;" id="firebase-status-desc">
+                            Configura Firebase para habilitar la sincronización
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instrucciones Simples -->
+            <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: var(--primary-color);">📋 Configuración Rápida (5 minutos)</h3>
+                <ol style="line-height: 2; color: #333;">
+                    <li>Ve a <a href="https://console.firebase.google.com" target="_blank" style="color: var(--primary-color); font-weight: bold;">Firebase Console</a></li>
+                    <li>Haz clic en <strong>"Agregar proyecto"</strong></li>
+                    <li>Ponle un nombre (ej: "ladrilleria")</li>
+                    <li>Desactiva Google Analytics (no lo necesitas)</li>
+                    <li>En el menú izquierdo: <strong>Realtime Database → Crear base de datos</strong></li>
+                    <li>Selecciona <strong>"Modo de prueba"</strong> → Habilitar</li>
+                    <li>Ve a <strong>Configuración del proyecto ⚙️ → Tus aplicaciones</strong></li>
+                    <li>Haz clic en el ícono <strong>&lt;/&gt;</strong> (Web)</li>
+                    <li>Registra la app y <strong>copia la configuración</strong></li>
+                </ol>
+            </div>
+
+            <!-- Formulario de Configuración -->
+            <div style="background: var(--bg-light); padding: 25px; border-radius: 8px; border: 2px solid var(--border-color);">
+                <h3 style="margin-top: 0; color: var(--primary-color); text-align: center;">🔧 Pegar Configuración</h3>
+                
+                <div class="form-group" style="margin: 20px 0;">
+                    <label>API Key:</label>
+                    <input type="text" id="firebase-apiKey" placeholder="AIzaSyD..." style="width: 100%; max-width: 100%;">
+                </div>
+
+                <div class="form-group" style="margin: 20px 0;">
+                    <label>Database URL:</label>
+                    <input type="text" id="firebase-databaseURL" placeholder="https://tu-proyecto.firebaseio.com" style="width: 100%; max-width: 100%;">
+                </div>
+
+                <div class="form-group" style="margin: 20px 0;">
+                    <label>Project ID:</label>
+                    <input type="text" id="firebase-projectId" placeholder="tu-proyecto-12345" style="width: 100%; max-width: 100%;">
+                </div>
+
+                <div style="text-align: center; margin-top: 25px;">
+                    <button class="action-button" onclick="saveFirebaseConfig()" style="font-size: 16px;">
+                        💾 Guardar y Activar
+                    </button>
+                    <button class="action-button" onclick="testFirebaseConnection()" style="background: #4CAF50; font-size: 16px;">
+                        🔌 Probar Conexión
+                    </button>
+                </div>
+            </div>
+
+            <div id="cloud-sync-status" style="margin: 20px 0; padding: 15px; border-radius: 6px; display: none;"></div>
+
+            <!-- Panel de Sincronización -->
+            <div id="sync-panel" style="display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow); margin-top: 30px;">
+                <h3 style="margin-top: 0; color: var(--primary-color); text-align: center;">🔄 Sincronización</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="text-align: center;">
+                        <button class="action-button" onclick="syncToCloud()" style="width: 100%; background: #2196F3;">
+                            ☁️ Subir a la Nube
+                        </button>
+                        <p style="margin: 10px 0; font-size: 12px; color: #666;">
+                            <span id="local-count">0</span> registros locales
+                        </p>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button class="action-button" onclick="syncFromCloud()" style="width: 100%; background: #4CAF50;">
+                            📥 Descargar de la Nube
+                        </button>
+                        <p style="margin: 10px 0; font-size: 12px; color: #666;">
+                            Sincronizar con otros dispositivos
+                        </p>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <button class="action-button" onclick="enableAutoSync()" style="width: 100%; background: #FF9800;">
+                            ⚡ Sincronización Automática
+                        </button>
+                        <p style="margin: 10px 0; font-size: 12px; color: #666;">
+                            <span id="auto-sync-status">Desactivada</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div style="background: #e8f5e9; padding: 15px; border-radius: 6px; margin-top: 20px; border-left: 4px solid #4CAF50;">
+                    <strong style="color: #2e7d32;">✅ Sincronización Configurada</strong>
+                    <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+                        Tus datos se guardan en la nube. Ahora puedes acceder desde cualquier dispositivo usando la misma configuración.
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="action-button" onclick="showScreen('main-menu')">Volver al Menú</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Reportes -->
+    <div class="container screen" id="reports">
+        <div class="header">
+            Reporte General
+            <button class="back-button" onclick="showScreen('report-selection')">×</button>
+        </div>
+        <div class="content">
+            <div class="weekly-report">
+                <div class="report-title">Reporte de Pedidos</div>
+                
+                <div class="report-summary">
+                    <div><strong>Total de millares:</strong> <span id="total-millares">0</span> (total de millares)</div>
+                    <div><strong>Venta Total:</strong> <span id="venta-total">0</span> (total de ventas)</div>
+                    <div><strong>Costo Fábrica:</strong> <span id="costo-fabrica">0</span> (costo de planta por millares)</div>
+                    <div><strong>Ganancia Choferes:</strong> <span id="ganancia-choferes">0</span> (millares × S/59)</div>
+                    <div><strong>Total Gastos:</strong> <span id="total-gastos-reporte">0</span> (gastos operativos)</div>
+                    <div><strong>Ganancia Total:</strong> <span id="ganancia-total">0</span> (ventas - costos - gastos - pago choferes)</div>
+                </div>
+
+                <div class="chofer-section">
+                    <div class="chofer-title">Chofer / Nombre</div>
+                </div>
+
+                <div id="weekly-report-table">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Millares</th>
+                                <th>Costo Fábrica</th>
+                                <th>Gastos</th>
+                                <th>Petroleo</th>
+                                <th>Pago Chofer</th>
+                                <th>Ventas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weekly-report-tbody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="report-actions">
+                    <button class="action-button" onclick="printReport()">IMPRIMIR</button>
+                    <button class="action-button" onclick="showOrdersViewer()">VISUALIZAR EL PEDIDO</button>
+                    <button class="action-button" onclick="showScreen('report-selection')">VOLVER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Visualización de Pedidos -->
+    <div class="container screen" id="orders-viewer">
+        <div class="header">
+            Pedidos y Gastos de Esta Semana
+            <button class="back-button" onclick="showScreen('reports')">×</button>
+        </div>
+        <div class="content">
+            <div class="orders-viewer">
+                <h3>Pedidos y Gastos de Esta Semana</h3>
+                
+                <div id="orders-viewer-content">
+                    <p>Cargando datos...</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="action-button" onclick="showScreen('reports')">Volver al Reporte</button>
+                    <button class="action-button" onclick="showScreen('main-menu')">Menú Principal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Gastos -->
+    <div class="container screen" id="gastos-form">
+        <div class="header">
+            <span id="gastos-title">Gastos</span>
+            <button class="back-button" onclick="showScreen('order-form')">×</button>
+        </div>
+        <div class="content">
+            <div class="gastos-form">
+                <div class="gastos-group">
+                    <label>Petroleo:</label>
+                    <input type="number" id="petroleo" class="gastos-input" step="0.01" placeholder="Ingrese cantidad">
+                </div>
+
+                <div class="gastos-group">
+                    <label>Otros:</label>
+                </div>
+
+                <div class="gastos-group" style="margin-left: 40px;">
+                    <label>Descripción:</label>
+                    <textarea id="otros-descripcion" class="gastos-textarea" placeholder="Ingrese descripción"></textarea>
+                </div>
+
+                <div class="gastos-group" style="margin-left: 40px;">
+                    <label>Cantidad S/:</label>
+                    <input type="number" id="otros-cantidad" class="gastos-input" step="0.01" placeholder="Ingrese cantidad">
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="action-button" onclick="saveGastos()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reporte por Vendedor -->
+    <div class="container screen" id="report-by-vendor">
+        <div class="header">
+            Reporte por Vendedor
+            <button class="back-button" onclick="showScreen('report-selection')">×</button>
+        </div>
+        <div class="content">
+            <div class="weekly-report">
+                <div class="report-title">Reporte de Ventas por Vendedor</div>
+                
+                <div id="vendor-report-content">
+                    <p>Cargando datos...</p>
+                </div>
+
+                <div class="report-actions">
+                    <button class="action-button" onclick="printVendorReport()">IMPRIMIR</button>
+                    <button class="action-button" onclick="showScreen('report-selection')">VOLVER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtro de Reporte por Semana -->
+    <div class="container screen" id="report-by-week-filter">
+        <div class="header">
+            Reporte por Semana
+            <button class="back-button" onclick="showScreen('report-selection')">×</button>
+        </div>
+        <div class="content">
+            <div class="search-filters">
+                <h3 style="text-align: center; color: var(--primary-color); margin-top: 0;">Selecciona el Rango de Fechas</h3>
+                
+                <div class="filter-row">
+                    <label>Fecha de Inicio:</label>
+                    <input type="date" id="week-start-date" class="filter-row select" style="border: 2px solid var(--border-color); border-radius: 6px; padding: 10px; max-width: 300px; width: 100%;">
+                </div>
+
+                <div class="filter-row">
+                    <label>Fecha de Fin:</label>
+                    <input type="date" id="week-end-date" class="filter-row select" style="border: 2px solid var(--border-color); border-radius: 6px; padding: 10px; max-width: 300px; width: 100%;">
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="action-button" onclick="generateWeekReport()">Generar Reporte</button>
+                </div>
+            </div>
+
+            <div id="week-report-results" style="display: none;">
+                <div class="report-summary">
+                    <div><strong>Total de millares:</strong> <span id="week-total-millares">0</span></div>
+                    <div><strong>Venta Total:</strong> <span id="week-venta-total">0</span></div>
+                    <div><strong>Costo Fábrica:</strong> <span id="week-costo-fabrica">0</span></div>
+                    <div><strong>Ganancia Choferes:</strong> <span id="week-ganancia-choferes">0</span></div>
+                    <div><strong>Total Gastos:</strong> <span id="week-total-gastos">0</span></div>
+                    <div><strong>Ganancia Total:</strong> <span id="week-ganancia-total">0</span></div>
+                </div>
+
+                <div id="week-report-table-container"></div>
+
+                <div class="report-actions">
+                    <button class="action-button" onclick="printWeekReport()">IMPRIMIR</button>
+                    <button class="action-button" onclick="showScreen('report-selection')">VOLVER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtro de Reporte por Mes -->
+    <div class="container screen" id="report-by-month-filter">
+        <div class="header">
+            Reporte por Mes
+            <button class="back-button" onclick="showScreen('report-selection')">×</button>
+        </div>
+        <div class="content">
+            <div class="search-filters">
+                <h3 style="text-align: center; color: var(--primary-color); margin-top: 0;">Selecciona el Mes y Año</h3>
+                
+                <div class="filter-row">
+                    <label>Mes:</label>
+                    <select id="month-select" style="border: 2px solid var(--border-color); border-radius: 6px; padding: 10px; max-width: 300px; width: 100%;">
+                        <option value="0">Enero</option>
+                        <option value="1">Febrero</option>
+                        <option value="2">Marzo</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Mayo</option>
+                        <option value="5">Junio</option>
+                        <option value="6">Julio</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Septiembre</option>
+                        <option value="9">Octubre</option>
+                        <option value="10">Noviembre</option>
+                        <option value="11">Diciembre</option>
+                    </select>
+                </div>
+
+                <div class="filter-row">
+                    <label>Año:</label>
+                    <select id="year-select" style="border: 2px solid var(--border-color); border-radius: 6px; padding: 10px; max-width: 300px; width: 100%;">
+                    </select>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="action-button" onclick="generateMonthReport()">Generar Reporte</button>
+                </div>
+            </div>
+
+            <div id="month-report-results" style="display: none;">
+                <div class="report-summary">
+                    <div><strong>Total de millares:</strong> <span id="month-total-millares">0</span></div>
+                    <div><strong>Venta Total:</strong> <span id="month-venta-total">0</span></div>
+                    <div><strong>Costo Fábrica:</strong> <span id="month-costo-fabrica">0</span></div>
+                    <div><strong>Ganancia Choferes:</strong> <span id="month-ganancia-choferes">0</span></div>
+                    <div><strong>Total Gastos:</strong> <span id="month-total-gastos">0</span></div>
+                    <div><strong>Ganancia Total:</strong> <span id="month-ganancia-total">0</span></div>
+                </div>
+
+                <div id="month-report-table-container"></div>
+
+                <div class="report-actions">
+                    <button class="action-button" onclick="printMonthReport()">IMPRIMIR</button>
+                    <button class="action-button" onclick="showScreen('report-selection')">VOLVER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentChofer = '';
+        let currentDay = '';
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let gastos = JSON.parse(localStorage.getItem('gastos')) || [];
+
+        // Precios de fábrica por millar
+        const preciosPlanta = {
+            'Ladrillera Choque': {
+                'H-10 ECO': 0.8,
+                'H-10 COM': 0.9,
+                'H-10 SEG': 0.45,
+                'PAND ECO': 0.85,
+                'PAND COM': 0.9,
+                'PAND SEG': 0.45,
+                'H-09 ECO': 0.75,
+                'H-09 COM': 0.8,
+                'H-09 SEG': 0.45,
+                'H-15': 2.15,
+                'H-15 SEG': 1,
+                'H-12': 2,
+                'H-12 SEG': 1,
+                'H-20': 4
+            },
+            'Ladrillera Arequipa': {
+                'H-10 ECO': 0.73,
+                'H-10 COM': 0.73, // Asumiendo mismo precio que ECO
+                'H-10 SEG': 0.55,
+                'PAND ECO': 0.68,
+                'PAND COM': 0.68, // Asumiendo mismo precio que ECO
+                'PAND SEG': 0.5,
+                'H-09 ECO': 0.65,
+                'H-09 COM': 0.65, // Asumiendo mismo precio que ECO
+                'H-09 SEG': 0.55, // Asumiendo mismo precio que H-10 SEG
+                'H-15': 2.0, // Estimando
+                'H-15 SEG': 1.0, // Estimando
+                'H-12': 1.8, // Estimando
+                'H-12 SEG': 0.9, // Estimando
+                'H-20': 3.5 // Estimando
+            }
+        };
+
+        // Función para mostrar pantallas
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+
+            // Cargar reportes si se selecciona esa pantalla
+            if (screenId === 'reports') {
+                loadWeeklyReport();
+            }
+            
+            // Cargar visualización de pedidos si se selecciona esa pantalla
+            if (screenId === 'orders-viewer') {
+                loadOrdersViewer();
+            }
+        }
+
+        // Mostrar formulario de gastos
+        function showGastosForm() {
+            updateGastosTitle();
+            showScreen('gastos-form');
+        }
+
+        // Actualizar título dinámico de gastos
+        function updateGastosTitle() {
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES');
+            
+            document.getElementById('gastos-title').textContent = `Gastos de ${currentChofer} - ${formattedDate}`;
+        }
+
+        // Selección de chofer
+        function selectChofer(chofer) {
+            currentChofer = chofer;
+            showScreen('day-selection');
+        }
+
+        // Selección de día
+        function selectDay(day) {
+            currentDay = day;
+            updateOrderTitle();
+            showScreen('order-form');
+        }
+
+        // Realizar búsqueda con filtros
+        function performSearch() {
+            const chofer = document.getElementById('search-chofer').value;
+            const dia = document.getElementById('search-dia').value;
+            
+            let filteredOrders = orders;
+            
+            // Aplicar filtros
+            if (chofer) {
+                filteredOrders = filteredOrders.filter(order => order.chofer === chofer);
+            }
+            
+            if (dia) {
+                filteredOrders = filteredOrders.filter(order => order.dia === dia);
+            }
+            
+            displaySearchResults(filteredOrders, chofer, dia);
+        }
+
+        // Mostrar resultados de búsqueda
+        function displaySearchResults(filteredOrders, chofer, dia) {
+            const summaryDiv = document.getElementById('search-results-summary');
+            const tableDiv = document.getElementById('search-results-table');
+            const tbody = document.getElementById('search-results-tbody');
+            
+            // Crear texto del filtro aplicado
+            let filterText = 'Todos los pedidos';
+            if (chofer && dia) {
+                filterText = `de ${chofer} y del día ${dia}`;
+            } else if (chofer) {
+                filterText = `de ${chofer}`;
+            } else if (dia) {
+                filterText = `del día ${dia}`;
+            }
+            
+            summaryDiv.innerHTML = `<strong>Todos los pedidos ${filterText}:</strong>`;
+            summaryDiv.style.display = 'block';
+            
+            if (filteredOrders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; padding: 20px;">No se encontraron pedidos con los filtros seleccionados</td></tr>';
+                tableDiv.style.display = 'block';
+                return;
+            }
+            
+            // Limpiar tabla
+            tbody.innerHTML = '';
+            
+            // Llenar tabla con resultados
+            filteredOrders.forEach(order => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${order.fecha}</td>
+                    <td>${order.cantidad}</td>
+                    <td>${order.tipoLadrillo}</td>
+                    <td>${order.fabrica}</td>
+                    <td>${order.chofer}</td>
+                    <td>${order.dia}</td>
+                    <td>${order.precioUnidad || '0.00'}</td>
+                    <td>${order.precioMillar || '0.00'}</td>
+                    <td>S/${parseFloat(order.total || 0).toFixed(2)}</td>
+                    <td>${order.formaPago}</td>
+                    <td>${order.numOperacion || '-'}</td>
+                    <td>${order.vendedor}</td>
+                    <td><button class="delete-button" onclick="confirmDeleteOrder(${order.id})">Eliminar</button></td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            tableDiv.style.display = 'block';
+        }
+
+        // Confirmar eliminación de pedido
+        function confirmDeleteOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) {
+                alert('Pedido no encontrado');
+                return;
+            }
+            
+            const confirmMessage = `¿Está seguro que desea eliminar este pedido?\n\n` +
+                                 `Chofer: ${order.chofer}\n` +
+                                 `Día: ${order.dia}\n` +
+                                 `Fecha: ${order.fecha}\n` +
+                                 `Tipo: ${order.tipoLadrillo}\n` +
+                                 `Cantidad: ${order.cantidad}\n` +
+                                 `Total: S/${order.total}\n\n` +
+                                 `Esta acción no se puede deshacer.`;
+            
+            if (confirm(confirmMessage)) {
+                deleteOrder(orderId);
+            }
+        }
+
+        // Eliminar pedido
+        function deleteOrder(orderId) {
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                orders.splice(orderIndex, 1);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                alert('Pedido eliminado exitosamente');
+                
+                // Recargar búsqueda actual
+                performSearch();
+            } else {
+                alert('Error: No se pudo eliminar el pedido');
+            }
+        }
+
+        // Actualizar título dinámico del pedido
+        function updateOrderTitle() {
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('es-ES');
+            
+            document.getElementById('order-title').textContent = `Pedido de ${currentChofer} / ${currentDay} / ${formattedDate}`;
+        }
+
+        // Actualizar campos de precio según el tipo de ladrillo
+        function updatePriceFields() {
+            const tipoLadrillo = document.getElementById('tipo-ladrillo').value;
+            const priceBoxSingle = document.getElementById('price-box-single');
+            const priceBoxMillar = document.getElementById('price-box-millar');
+            const precioUnidad = document.getElementById('precio-unidad');
+            const precioMillar = document.getElementById('precio-millar');
+            
+            // Limpiar campos
+            precioUnidad.value = '';
+            precioMillar.value = '';
+            
+            // Verificar si es ladrillo techo (H-15, H-12, H-20)
+            const esTecho = tipoLadrillo === 'H-15' || tipoLadrillo === 'H-15 SEG' || 
+                           tipoLadrillo === 'H-12' || tipoLadrillo === 'H-12 SEG' || 
+                           tipoLadrillo === 'H-20';
+            
+            if (esTecho) {
+                // Mostrar precio por unidad para ladrillos techo
+                priceBoxSingle.style.display = 'block';
+                priceBoxMillar.style.display = 'none';
+                precioMillar.value = '0';
+            } else if (tipoLadrillo !== '') {
+                // Mostrar precio por millar para otros tipos
+                priceBoxSingle.style.display = 'none';
+                priceBoxMillar.style.display = 'block';
+                precioUnidad.value = '0';
+            } else {
+                // No mostrar ningún campo si no se ha seleccionado tipo
+                priceBoxSingle.style.display = 'none';
+                priceBoxMillar.style.display = 'none';
+            }
+            
+            calculateTotal();
+        }
+
+        // Mostrar/ocultar campo de N° de Operación según forma de pago
+        function togglePaymentFields() {
+            const formaPago = document.querySelector('input[name="forma-pago"]:checked')?.value;
+            const numOperacionGroup = document.getElementById('num-operacion-group');
+            const numOperacionInput = document.getElementById('num-operacion');
+            
+            if (formaPago === 'Deposito') {
+                numOperacionGroup.style.display = 'block';
+                numOperacionInput.required = true;
+            } else {
+                numOperacionGroup.style.display = 'none';
+                numOperacionInput.required = false;
+                numOperacionInput.value = '';
+            }
+        }
+
+        // Calcular total automáticamente
+        function calculateTotal() {
+            const cantidad = parseFloat(document.getElementById('cantidad').value) || 0;
+            const precioUnidad = parseFloat(document.getElementById('precio-unidad').value) || 0;
+            const precioMillar = parseFloat(document.getElementById('precio-millar').value) || 0;
+            const tipoLadrillo = document.getElementById('tipo-ladrillo').value;
+            
+            // Verificar si es ladrillo techo
+            const esTecho = tipoLadrillo === 'H-15' || tipoLadrillo === 'H-15 SEG' || 
+                           tipoLadrillo === 'H-12' || tipoLadrillo === 'H-12 SEG' || 
+                           tipoLadrillo === 'H-20';
+            
+            let total = 0;
+            
+            if (cantidad > 0 && tipoLadrillo !== '') {
+                if (esTecho && precioUnidad > 0) {
+                    // Para ladrillos techo: cantidad * precio por unidad
+                    total = cantidad * precioUnidad;
+                } else if (!esTecho && precioMillar > 0) {
+                    // Para otros ladrillos: (cantidad / 1000) * precio por millar
+                    total = (cantidad / 1000) * precioMillar;
+                }
+            }
+            
+            // Actualizar los campos de total
+            document.getElementById('total').value = total.toFixed(2);
+            document.getElementById('total-final').value = total.toFixed(2);
+        }
+
+        // Event listeners para cálculo automático (ahora están directamente en el HTML)
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     document.getElementById('cantidad').addEventListener('input', calculateTotal);
+        //     document.getElementById('precio-unidad').addEventListener('input', calculateTotal);
+        //     document.getElementById('precio-millar').addEventListener('input', calculateTotal);
+        //     document.getElementById('tipo-ladrillo').addEventListener('change', calculateTotal);
+        // });
+
+        // Guardar pedido
+        function saveOrder() {
+            // Validar campos requeridos
+            const cantidad = document.getElementById('cantidad').value;
+            const tipoLadrillo = document.getElementById('tipo-ladrillo').value;
+            const fabrica = document.getElementById('fabrica').value;
+            const vendedor = document.getElementById('vendedor').value;
+            const formaPago = document.querySelector('input[name="forma-pago"]:checked')?.value;
+            const numOperacion = document.getElementById('num-operacion').value;
+            
+            if (!cantidad || !tipoLadrillo || !fabrica || !vendedor || !formaPago) {
+                alert('Por favor complete todos los campos requeridos');
+                return;
+            }
+            
+            // Validar N° de operación si es depósito
+            if (formaPago === 'Deposito' && !numOperacion) {
+                alert('Debe ingresar el N° de Operación para pago por depósito');
+                return;
+            }
+            
+            // Validar precio según tipo de ladrillo
+            const precioUnidad = document.getElementById('precio-unidad').value;
+            const precioMillar = document.getElementById('precio-millar').value;
+            const esTecho = tipoLadrillo === 'H-15' || tipoLadrillo === 'H-15 SEG' || 
+                           tipoLadrillo === 'H-12' || tipoLadrillo === 'H-12 SEG' || 
+                           tipoLadrillo === 'H-20';
+            
+            if (esTecho && !precioUnidad) {
+                alert('Debe ingresar el precio por unidad para ladrillos techo (H-15, H-12, H-20)');
+                return;
+            } else if (!esTecho && !precioMillar) {
+                alert('Debe ingresar el precio por millar para este tipo de ladrillo');
+                return;
+            }
+
+            const now = new Date();
+            const order = {
+                id: Date.now(),
+                chofer: currentChofer,
+                dia: currentDay,
+                fecha: now.toLocaleDateString(),
+                fechaISO: now.toISOString(),
+                hora: now.toLocaleTimeString(),
+                cantidad: cantidad,
+                tipoLadrillo: tipoLadrillo,
+                precioUnidad: precioUnidad,
+                precioMillar: precioMillar,
+                total: document.getElementById('total-final').value,
+                formaPago: formaPago,
+                numOperacion: numOperacion,
+                fabrica: fabrica,
+                vendedor: vendedor
+            };
+
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            alert('Pedido guardado exitosamente');
+            
+            // Limpiar formulario
+            document.getElementById('order-form').querySelectorAll('input, select').forEach(field => {
+                if (field.type === 'radio') {
+                    field.checked = false;
+                } else {
+                    field.value = '';
+                }
+            });
+            
+            // Ocultar campos de precio y N° de operación
+            document.getElementById('price-box-single').style.display = 'none';
+            document.getElementById('price-box-millar').style.display = 'none';
+            document.getElementById('num-operacion-group').style.display = 'none';
+            
+            // Mantener en la pantalla del formulario para agregar más pedidos
+            // No llamar a showScreen('main-menu')
+        }
+
+        // Buscar pedidos por chofer (función legacy mantenida para compatibilidad)
+        function searchOrders() {
+            // Esta función se mantiene para evitar errores, pero ahora redirige a la nueva función
+            performSearch();
+        }
+
+        // Cargar reportes
+        function loadReports() {
+            const reportsDiv = document.getElementById('reports-content');
+            
+            if (orders.length === 0 && gastos.length === 0) {
+                reportsDiv.innerHTML = '<p>No hay datos registrados</p>';
+                return;
+            }
+
+            // Estadísticas de pedidos
+            const totalOrders = orders.length;
+            const totalAmount = orders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+            
+            // Estadísticas de gastos
+            const totalGastos = gastos.length;
+            const totalGastosAmount = gastos.reduce((sum, gasto) => sum + gasto.totalGastos, 0);
+            
+            // Pedidos por chofer
+            const ordersByChofer = {};
+            orders.forEach(order => {
+                if (!ordersByChofer[order.chofer]) {
+                    ordersByChofer[order.chofer] = { count: 0, total: 0, gastos: 0 };
+                }
+                ordersByChofer[order.chofer].count++;
+                ordersByChofer[order.chofer].total += parseFloat(order.total || 0);
+            });
+            
+            // Gastos por chofer
+            gastos.forEach(gasto => {
+                if (!ordersByChofer[gasto.chofer]) {
+                    ordersByChofer[gasto.chofer] = { count: 0, total: 0, gastos: 0 };
+                }
+                ordersByChofer[gasto.chofer].gastos += gasto.totalGastos;
+            });
+
+            // Pedidos por día
+            const ordersByDay = {};
+            orders.forEach(order => {
+                if (!ordersByDay[order.dia]) {
+                    ordersByDay[order.dia] = 0;
+                }
+                ordersByDay[order.dia]++;
+            });
+
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h4>Estadísticas Generales</h4>
+                    <p><strong>Total de Pedidos:</strong> ${totalOrders}</p>
+                    <p><strong>Monto Total Ventas:</strong> S/${totalAmount.toFixed(2)}</p>
+                    <p><strong>Total de Gastos:</strong> ${totalGastos} registros</p>
+                    <p><strong>Monto Total Gastos:</strong> S/${totalGastosAmount.toFixed(2)}</p>
+                    <p><strong>Balance:</strong> S/${(totalAmount - totalGastosAmount).toFixed(2)}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4>Resumen por Chofer</h4>
+            `;
+
+            Object.keys(ordersByChofer).forEach(chofer => {
+                const data = ordersByChofer[chofer];
+                const balance = data.total - data.gastos;
+                html += `
+                    <div class="order-item">
+                        <strong>${chofer}:</strong><br>
+                        Pedidos: ${data.count} - S/${data.total.toFixed(2)}<br>
+                        Gastos: S/${data.gastos.toFixed(2)}<br>
+                        <strong>Balance: S/${balance.toFixed(2)}</strong>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                
+                <div>
+                    <h4>Pedidos por Día</h4>
+            `;
+
+            Object.keys(ordersByDay).forEach(dia => {
+                html += `
+                    <div class="order-item">
+                        <strong>${dia}:</strong> ${ordersByDay[dia]} pedidos
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            reportsDiv.innerHTML = html;
+        }
+
+        // Guardar gastos
+        function saveGastos() {
+            const petroleo = document.getElementById('petroleo').value;
+            const otrosDescripcion = document.getElementById('otros-descripcion').value;
+            const otrosCantidad = document.getElementById('otros-cantidad').value;
+            
+            // Validar que al menos un campo tenga datos
+            if (!petroleo && !otrosDescripcion && !otrosCantidad) {
+                alert('Debe ingresar al menos un gasto');
+                return;
+            }
+            
+            // Validar que si hay descripción en "Otros", también haya cantidad
+            if (otrosDescripcion && !otrosCantidad) {
+                alert('Debe ingresar la cantidad para "Otros" si proporciona una descripción');
+                return;
+            }
+            
+            // Validar que si hay cantidad en "Otros", también haya descripción
+            if (otrosCantidad && !otrosDescripcion) {
+                alert('Debe ingresar la descripción para "Otros" si proporciona una cantidad');
+                return;
+            }
+
+            const now = new Date();
+            const gasto = {
+                id: Date.now(),
+                chofer: currentChofer,
+                dia: currentDay,
+                fecha: now.toLocaleDateString(),
+                fechaISO: now.toISOString(),
+                hora: now.toLocaleTimeString(),
+                petroleo: parseFloat(petroleo) || 0,
+                otrosDescripcion: otrosDescripcion,
+                otrosCantidad: parseFloat(otrosCantidad) || 0,
+                totalGastos: (parseFloat(petroleo) || 0) + (parseFloat(otrosCantidad) || 0)
+            };
+
+            gastos.push(gasto);
+            localStorage.setItem('gastos', JSON.stringify(gastos));
+            
+            alert('Gastos guardados exitosamente');
+            
+            // Limpiar formulario
+            document.getElementById('petroleo').value = '';
+            document.getElementById('otros-descripcion').value = '';
+            document.getElementById('otros-cantidad').value = '';
+            
+            showScreen('order-form');
+        }
+
+        // Mostrar visualizador de pedidos
+        function showOrdersViewer() {
+            showScreen('orders-viewer');
+        }
+
+        // Cargar reporte semanal
+        function loadWeeklyReport() {
+            const tbody = document.getElementById('weekly-report-tbody');
+            const totalMillaresSpan = document.getElementById('total-millares');
+            const ventaTotalSpan = document.getElementById('venta-total');
+            const costoFabricaSpan = document.getElementById('costo-fabrica');
+            const gananciaChoferesSpan = document.getElementById('ganancia-choferes');
+            const totalGastosSpan = document.getElementById('total-gastos-reporte');
+            const gananciaTotalSpan = document.getElementById('ganancia-total');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No hay pedidos registrados para esta semana</td></tr>';
+                totalMillaresSpan.textContent = '0';
+                ventaTotalSpan.textContent = '0';
+                costoFabricaSpan.textContent = '0';
+                gananciaChoferesSpan.textContent = '0';
+                totalGastosSpan.textContent = '0';
+                gananciaTotalSpan.textContent = '0';
+                return;
+            }
+
+            // Obtener pedidos y gastos de esta semana
+            const weeklyOrders = getWeeklyOrders();
+            const weeklyGastos = getWeeklyGastos();
+            
+            // Agrupar por chofer
+            const choferData = {};
+            let totalMillares = 0;
+            let ventaTotal = 0;
+            let costoFabricaTotal = 0;
+            
+            // Procesar pedidos
+            weeklyOrders.forEach(order => {
+                const chofer = order.chofer;
+                if (!choferData[chofer]) {
+                    choferData[chofer] = {
+                        millares: 0,
+                        costoFabrica: 0,
+                        gastos: 0,
+                        petroleo: 0,
+                        pagoChofer: 0,
+                        ventas: 0
+                    };
+                }
+                
+                // Calcular millares con la conversión correcta
+                const cantidad = parseFloat(order.cantidad || 0);
+                const esTecho = order.tipoLadrillo === 'H-15' || order.tipoLadrillo === 'H-15 SEG' || 
+                               order.tipoLadrillo === 'H-12' || order.tipoLadrillo === 'H-12 SEG' || 
+                               order.tipoLadrillo === 'H-20';
+                
+                let millares = 0;
+                if (esTecho) {
+                    // Para ladrillos techo: 350 unidades = 1 millar
+                    millares = cantidad / 350;
+                } else {
+                    // Para H-10 y panderetas: 1000 unidades = 1 millar
+                    millares = cantidad / 1000;
+                }
+                
+                choferData[chofer].millares += millares;
+                totalMillares += millares;
+                
+                // Calcular costo de fábrica
+                const fabrica = order.fabrica;
+                const tipoLadrillo = order.tipoLadrillo;
+                const precioPlanta = preciosPlanta[fabrica] && preciosPlanta[fabrica][tipoLadrillo] 
+                    ? preciosPlanta[fabrica][tipoLadrillo] 
+                    : 0;
+                const costoFabricaOrder = millares * precioPlanta * 1000; // precio por millar
+                
+                choferData[chofer].costoFabrica += costoFabricaOrder;
+                costoFabricaTotal += costoFabricaOrder;
+                
+                // Calcular pago del chofer (59 por millar)
+                const pagoChoferOrder = millares * 59;
+                choferData[chofer].pagoChofer += pagoChoferOrder;
+                
+                // Calcular ventas (total de ventas del chofer)
+                const ventasOrder = parseFloat(order.total || 0);
+                choferData[chofer].ventas += ventasOrder;
+                ventaTotal += ventasOrder;
+            });
+            
+            // Procesar gastos
+            weeklyGastos.forEach(gasto => {
+                const chofer = gasto.chofer;
+                if (!choferData[chofer]) {
+                    choferData[chofer] = {
+                        millares: 0,
+                        costoFabrica: 0,
+                        gastos: 0,
+                        petroleo: 0,
+                        pagoChofer: 0,
+                        ventas: 0
+                    };
+                }
+                
+                // Sumar gastos totales
+                choferData[chofer].gastos += gasto.totalGastos;
+                
+                // Sumar petroleo específicamente
+                choferData[chofer].petroleo += gasto.petroleo;
+            });
+            
+            // Calcular totales
+            const totalGastos = Object.values(choferData).reduce((sum, data) => sum + data.gastos, 0);
+            const totalPagoChoferes = totalMillares * 59;
+            const gananciaTotal = ventaTotal - costoFabricaTotal - totalGastos - totalPagoChoferes;
+            
+            // Limpiar tabla
+            tbody.innerHTML = '';
+            
+            // Llenar tabla agrupada por chofer
+            Object.keys(choferData).forEach(chofer => {
+                const data = choferData[chofer];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td><strong>${chofer}</strong></td>
+                    <td>${data.millares.toFixed(2)}</td>
+                    <td>S/${data.costoFabrica.toFixed(2)}</td>
+                    <td>S/${data.gastos.toFixed(2)}</td>
+                    <td>S/${data.petroleo.toFixed(2)}</td>
+                    <td>S/${data.pagoChofer.toFixed(2)}</td>
+                    <td>S/${data.ventas.toFixed(2)}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Si no hay datos, mostrar mensaje
+            if (Object.keys(choferData).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">No hay datos para esta semana</td></tr>';
+            }
+            
+            // Actualizar totales
+            totalMillaresSpan.textContent = totalMillares.toFixed(2);
+            ventaTotalSpan.textContent = ventaTotal.toFixed(0);
+            costoFabricaSpan.textContent = costoFabricaTotal.toFixed(0);
+            gananciaChoferesSpan.textContent = totalPagoChoferes.toFixed(0);
+            totalGastosSpan.textContent = totalGastos.toFixed(0);
+            gananciaTotalSpan.textContent = Math.abs(gananciaTotal).toFixed(0);
+        }
+
+        // Obtener gastos de esta semana
+        function getWeeklyGastos() {
+            // Retornar todos los gastos para mantener consistencia con getWeeklyOrders
+            return gastos;
+        }
+
+        // Obtener todos los pedidos (no solo de esta semana)
+        function getWeeklyOrders() {
+            // Retornar todos los pedidos en lugar de filtrar por semana
+            return orders;
+        }
+
+        // Cargar visualizador de pedidos
+        function loadOrdersViewer() {
+            const contentDiv = document.getElementById('orders-viewer-content');
+            
+            // Obtener solo los pedidos y gastos de esta semana
+            const weeklyOrders = getWeeklyOrders();
+            const weeklyGastos = getWeeklyGastos();
+            
+            if (weeklyOrders.length === 0 && weeklyGastos.length === 0) {
+                contentDiv.innerHTML = '<p>No hay datos registrados para esta semana</p>';
+                return;
+            }
+
+            let html = '';
+            
+            // Sección de Pedidos
+            if (weeklyOrders.length > 0) {
+                html += `
+                    <h4>📋 PEDIDOS DE ESTA SEMANA (${weeklyOrders.length} pedidos)</h4>
+                    <table class="view-orders-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Chofer</th>
+                                <th>Día</th>
+                                <th>Cantidad</th>
+                                <th>Tipo Ladrillo</th>
+                                <th>Precio Unit.</th>
+                                <th>Precio Millar</th>
+                                <th>Total</th>
+                                <th>Forma Pago</th>
+                                <th>N° Operación</th>
+                                <th>Fábrica</th>
+                                <th>Vendedor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                weeklyOrders.forEach(order => {
+                    html += `
+                        <tr>
+                            <td>${order.id}</td>
+                            <td>${order.fecha}</td>
+                            <td>${order.hora}</td>
+                            <td>${order.chofer}</td>
+                            <td>${order.dia}</td>
+                            <td>${order.cantidad}</td>
+                            <td>${order.tipoLadrillo}</td>
+                            <td>${order.precioUnidad || '0.00'}</td>
+                            <td>${order.precioMillar || '0.00'}</td>
+                            <td>S/${parseFloat(order.total || 0).toFixed(2)}</td>
+                            <td>${order.formaPago}</td>
+                            <td>${order.numOperacion || '-'}</td>
+                            <td>${order.fabrica}</td>
+                            <td>${order.vendedor}</td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table><br><br>';
+            }
+            
+            // Sección de Gastos
+            if (weeklyGastos.length > 0) {
+                html += `
+                    <h4>💰 GASTOS DE ESTA SEMANA (${weeklyGastos.length} registros)</h4>
+                    <table class="view-orders-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Chofer</th>
+                                <th>Día</th>
+                                <th>Petroleo (S/.)</th>
+                                <th>Otros - Descripción</th>
+                                <th>Otros - Cantidad (S/.)</th>
+                                <th>Total Gastos (S/.)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                weeklyGastos.forEach(gasto => {
+                    html += `
+                        <tr>
+                            <td>${gasto.id}</td>
+                            <td>${gasto.fecha}</td>
+                            <td>${gasto.hora}</td>
+                            <td>${gasto.chofer}</td>
+                            <td>${gasto.dia}</td>
+                            <td>S/${gasto.petroleo.toFixed(2)}</td>
+                            <td>${gasto.otrosDescripcion || '-'}</td>
+                            <td>S/${gasto.otrosCantidad.toFixed(2)}</td>
+                            <td><strong>S/${gasto.totalGastos.toFixed(2)}</strong></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table><br><br>';
+            }
+            
+            // Resumen general con todos los costos de esta semana
+            const totalVentas = weeklyOrders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+            const totalGastosAmount = weeklyGastos.reduce((sum, gasto) => sum + gasto.totalGastos, 0);
+            
+            // Calcular millares totales y costos de fábrica
+            let totalMillares = 0;
+            let costoFabricaTotal = 0;
+            
+            weeklyOrders.forEach(order => {
+                const cantidad = parseFloat(order.cantidad || 0);
+                const esTecho = order.tipoLadrillo === 'H-15' || order.tipoLadrillo === 'H-15 SEG' || 
+                               order.tipoLadrillo === 'H-12' || order.tipoLadrillo === 'H-12 SEG' || 
+                               order.tipoLadrillo === 'H-20';
+                
+                let millares = 0;
+                if (esTecho) {
+                    millares = cantidad / 350; // 350 unidades = 1 millar para techo
+                } else {
+                    millares = cantidad / 1000; // 1000 unidades = 1 millar para H-10/pandereta
+                }
+                totalMillares += millares;
+                
+                // Calcular costo de fábrica
+                const fabrica = order.fabrica;
+                const tipoLadrillo = order.tipoLadrillo;
+                const precioPlanta = preciosPlanta[fabrica] && preciosPlanta[fabrica][tipoLadrillo] 
+                    ? preciosPlanta[fabrica][tipoLadrillo] 
+                    : 0;
+                costoFabricaTotal += millares * precioPlanta * 1000; // precio por millar
+            });
+            
+            const totalPagoChoferes = totalMillares * 59;
+            const balance = totalVentas - costoFabricaTotal - totalGastosAmount - totalPagoChoferes;
+            
+            html += `
+                <div style="background-color: #f0f0f0; padding: 15px; border: 2px solid #333; border-radius: 5px;">
+                    <h4>📊 RESUMEN DE ESTA SEMANA</h4>
+                    <div><strong>Total Ventas:</strong> S/${totalVentas.toFixed(2)}</div>
+                    <div><strong>Costo Fábrica Total:</strong> S/${costoFabricaTotal.toFixed(2)} (${totalMillares.toFixed(2)} millares)</div>
+                    <div><strong>Total Gastos:</strong> S/${totalGastosAmount.toFixed(2)}</div>
+                    <div><strong>Ganancia Choferes:</strong> S/${totalPagoChoferes.toFixed(2)} (${totalMillares.toFixed(2)} millares × S/59)</div>
+                    <div style="font-size: 18px; color: ${balance >= 0 ? 'green' : 'red'};"><strong>Ganancia Total: S/${Math.abs(balance).toFixed(2)}</strong></div>
+                    <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                        <em>Ganancia = Ventas - Costo Fábrica - Gastos - Pago Choferes</em>
+                    </div>
+                </div>
+            `;
+            
+            contentDiv.innerHTML = html;
+        }
+
+        // Función legacy mantenida para compatibilidad
+        function loadReports() {
+            loadWeeklyReport();
+        }
+
+        // Función para imprimir reporte
+        function printReport() {
+            // Obtener datos de la semana actual
+            const weeklyOrders = getWeeklyOrders();
+            const weeklyGastos = getWeeklyGastos();
+            
+            // Calcular totales
+            const totalVentas = weeklyOrders.reduce((sum, order) => sum + parseFloat(order.total || 0), 0);
+            const totalGastosAmount = weeklyGastos.reduce((sum, gasto) => sum + gasto.totalGastos, 0);
+            
+            let totalMillares = 0;
+            let costoFabricaTotal = 0;
+            
+            weeklyOrders.forEach(order => {
+                const cantidad = parseFloat(order.cantidad || 0);
+                const esTecho = order.tipoLadrillo === 'H-15' || order.tipoLadrillo === 'H-15 SEG' || 
+                               order.tipoLadrillo === 'H-12' || order.tipoLadrillo === 'H-12 SEG' || 
+                               order.tipoLadrillo === 'H-20';
+                
+                let millares = 0;
+                if (esTecho) {
+                    millares = cantidad / 350;
+                } else {
+                    millares = cantidad / 1000;
+                }
+                totalMillares += millares;
+                
+                const fabrica = order.fabrica;
+                const tipoLadrillo = order.tipoLadrillo;
+                const precioPlanta = preciosPlanta[fabrica] && preciosPlanta[fabrica][tipoLadrillo] 
+                    ? preciosPlanta[fabrica][tipoLadrillo] 
+                    : 0;
+                costoFabricaTotal += millares * precioPlanta * 1000;
+            });
+            
+            const totalPagoChoferes = totalMillares * 59;
+            const gananciaTotal = totalVentas - costoFabricaTotal - totalGastosAmount - totalPagoChoferes;
+            
+            // Agrupar por chofer
+            const choferData = {};
+            weeklyOrders.forEach(order => {
+                const chofer = order.chofer;
+                if (!choferData[chofer]) {
+                    choferData[chofer] = {
+                        millares: 0,
+                        costoFabrica: 0,
+                        gastos: 0,
+                        petroleo: 0,
+                        pagoChofer: 0,
+                        ventas: 0
+                    };
+                }
+                
+                const cantidad = parseFloat(order.cantidad || 0);
+                const esTecho = order.tipoLadrillo === 'H-15' || order.tipoLadrillo === 'H-15 SEG' || 
+                               order.tipoLadrillo === 'H-12' || order.tipoLadrillo === 'H-12 SEG' || 
+                               order.tipoLadrillo === 'H-20';
+                
+                let millares = 0;
+                if (esTecho) {
+                    millares = cantidad / 350;
+                } else {
+                    millares = cantidad / 1000;
+                }
+                
+                choferData[chofer].millares += millares;
+                
+                const fabrica = order.fabrica;
+                const tipoLadrillo = order.tipoLadrillo;
+                const precioPlanta = preciosPlanta[fabrica] && preciosPlanta[fabrica][tipoLadrillo] 
+                    ? preciosPlanta[fabrica][tipoLadrillo] 
+                    : 0;
+                const costoFabricaOrder = millares * precioPlanta * 1000;
+                
+                choferData[chofer].costoFabrica += costoFabricaOrder;
+                choferData[chofer].pagoChofer += millares * 59;
+                choferData[chofer].ventas += parseFloat(order.total || 0);
+            });
+            
+            weeklyGastos.forEach(gasto => {
+                const chofer = gasto.chofer;
+                if (!choferData[chofer]) {
+                    choferData[chofer] = {
+                        millares: 0,
+                        costoFabrica: 0,
+                        gastos: 0,
+                        petroleo: 0,
+                        pagoChofer: 0,
+                        ventas: 0
+                    };
+                }
+                
+                choferData[chofer].gastos += gasto.totalGastos;
+                choferData[chofer].petroleo += gasto.petroleo;
+            });
+            
+            // Crear contenido para imprimir
+            const today = new Date();
+            const fechaReporte = today.toLocaleDateString('es-ES');
+            
+            let reporteHTML = `
+                <div class="printable-report">
+                    <h1 style="text-align: center; margin-bottom: 30px;">REPORTE SEMANAL - LADRILLERÍA</h1>
+                    <p style="text-align: center; margin-bottom: 30px;"><strong>Fecha del Reporte:</strong> ${fechaReporte}</p>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h3>RESUMEN GENERAL</h3>
+                        <table style="width: 100%; margin-bottom: 20px;">
+                            <tr>
+                                <td><strong>Total de millares:</strong></td>
+                                <td>${totalMillares.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Venta Total:</strong></td>
+                                <td>S/${totalVentas.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Costo Fábrica:</strong></td>
+                                <td>S/${costoFabricaTotal.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ganancia Choferes:</strong></td>
+                                <td>S/${totalPagoChoferes.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Total Gastos:</strong></td>
+                                <td>S/${totalGastosAmount.toFixed(2)}</td>
+                            </tr>
+                            <tr style="background-color: #f0f0f0;">
+                                <td><strong>Ganancia Total:</strong></td>
+                                <td><strong>S/${Math.abs(gananciaTotal).toFixed(2)}</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div>
+                        <h3>DETALLE POR CHOFER</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Millares</th>
+                                    <th>Costo Fábrica</th>
+                                    <th>Gastos</th>
+                                    <th>Petroleo</th>
+                                    <th>Pago Chofer</th>
+                                    <th>Ventas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            Object.keys(choferData).forEach(chofer => {
+                const data = choferData[chofer];
+                reporteHTML += `
+                    <tr>
+                        <td><strong>${chofer}</strong></td>
+                        <td>${data.millares.toFixed(2)}</td>
+                        <td>S/${data.costoFabrica.toFixed(2)}</td>
+                        <td>S/${data.gastos.toFixed(2)}</td>
+                        <td>S/${data.petroleo.toFixed(2)}</td>
+                        <td>S/${data.pagoChofer.toFixed(2)}</td>
+                        <td>S/${data.ventas.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            reporteHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #666;">
+                        <p>Reporte generado el ${fechaReporte} a las ${today.toLocaleTimeString('es-ES')}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Crear ventana de impresión
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Reporte Semanal - Ladrillería</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                            th { background-color: #f0f0f0; font-weight: bold; }
+                            h1, h3 { color: #333; }
+                            @media print {
+                                body { margin: 0; }
+                                @page { margin: 1cm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${reporteHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Función para exportar datos (bonus)
+        function exportData() {
+            const dataStr = JSON.stringify(orders, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'pedidos_ladrilleria.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Función para limpiar todos los datos (DESACTIVADA PARA PRODUCCIÓN)
+        /*
+        function clearAllData() {
+            if (confirm('¿Está seguro que desea eliminar TODOS los pedidos y gastos?\n\nEsta acción no se puede deshacer.')) {
+                localStorage.removeItem('orders');
+                localStorage.removeItem('gastos');
+                
+                // Reinicializar variables
+                orders = [];
+                gastos = [];
+                
+                alert('Todos los datos han sido eliminados correctamente.\n\nEl sistema está listo para usar desde cero.');
+                
+                // Si está en pantalla de reportes, recargar
+                if (document.getElementById('reports').classList.contains('active')) {
+                    loadWeeklyReport();
+                }
+                
+                // Si está en pantalla de búsqueda, limpiar resultados
+                if (document.getElementById('search').classList.contains('active')) {
+                    document.getElementById('search-results-summary').style.display = 'none';
+                    document.getElementById('search-results-table').style.display = 'none';
+                }
+            }
+        }
+        */
+
+        // Limpiar datos de prueba - EJECUTAR UNA SOLA VEZ (DESACTIVADO)
+        // clearAllData();
+
+        // ==================== FUNCIONES PARA LOGO ====================
+
+        // Función para agregar logo a todos los encabezados
+        function initializeHeaders() {
+            const headers = document.querySelectorAll('.header');
+            console.log('Inicializando headers:', headers.length); // Debug
+            
+            headers.forEach(header => {
+                // Verificar si ya tiene logo
+                if (!header.querySelector('.header-logo')) {
+                    // Buscar elementos especiales que deben preservarse
+                    const orderTitle = header.querySelector('#order-title');
+                    const gastosTitle = header.querySelector('#gastos-title');
+                    const backButton = header.querySelector('.back-button');
+                    
+                    let title = '';
+                    let specialElement = null;
+                    
+                    if (orderTitle) {
+                        title = orderTitle.textContent;
+                        specialElement = orderTitle;
+                    } else if (gastosTitle) {
+                        title = gastosTitle.textContent;
+                        specialElement = gastosTitle;
+                    } else {
+                        title = header.textContent.trim();
+                    }
+                    
+                    console.log('Procesando header:', title); // Debug
+                    
+                    // Limpiar el contenido actual pero preservar elementos especiales
+                    if (specialElement) {
+                        // Si hay un elemento especial, solo agregar el logo
+                        const logo = document.createElement('img');
+                        logo.src = 'logo.png';
+                        logo.alt = 'LADRILLOS AREQUIPA S.A.C.';
+                        logo.className = 'header-logo';
+                        
+                        // Debug del logo
+                        logo.onload = function() {
+                            console.log('Logo cargado correctamente');
+                            this.style.display = 'block';
+                        };
+                        
+                        logo.onerror = function() {
+                            console.log('Error cargando logo, verificar ruta: logo.png');
+                            this.style.display = 'none';
+                        };
+                        
+                        // Insertar logo al principio
+                        header.insertBefore(logo, specialElement);
+                        
+                        // Reagregar botón de volver si existía
+                        if (backButton) {
+                            header.appendChild(backButton);
+                        }
+                    } else {
+                        // Si no hay elementos especiales, hacer el proceso normal
+                        header.innerHTML = '';
+                        
+                        // Agregar logo
+                        const logo = document.createElement('img');
+                        logo.src = 'logo.png';
+                        logo.alt = 'LADRILLOS AREQUIPA S.A.C.';
+                        logo.className = 'header-logo';
+                        
+                        // Debug del logo
+                        logo.onload = function() {
+                            console.log('Logo cargado correctamente');
+                            this.style.display = 'block';
+                        };
+                        
+                        logo.onerror = function() {
+                            console.log('Error cargando logo, verificar ruta: logo.png');
+                            this.style.display = 'none';
+                        };
+                        
+                        // Agregar texto del título
+                        const titleDiv = document.createElement('div');
+                        titleDiv.className = 'header-text';
+                        titleDiv.textContent = title;
+                        
+                        header.appendChild(logo);
+                        header.appendChild(titleDiv);
+                        
+                        // Reagregar botón de volver si existía
+                        if (backButton) {
+                            header.appendChild(backButton);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Inicializar headers cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeHeaders();
+        });
+
+        // También ejecutar después de un pequeño delay para asegurar que todo esté cargado
+        setTimeout(function() {
+            initializeHeaders();
+        }, 100);
+
+        // Función de prueba para verificar el logo
+        function testLogo() {
+            const img = new Image();
+            img.onload = function() {
+                console.log('✅ Logo encontrado y cargado correctamente');
+                alert('Logo encontrado correctamente. Debería aparecer en la página.');
+            };
+            img.onerror = function() {
+                console.log('❌ Error: No se puede cargar logo.png');
+                alert('Error: No se puede cargar el logo. Verifica que:\n1. El archivo se llame exactamente "logo.png"\n2. Esté en la misma carpeta que el HTML\n3. El archivo no esté corrupto');
+            };
+            img.src = 'logo.png';
+        }
+
+        // Ejecutar prueba del logo después de cargar la página
+        setTimeout(testLogo, 500);
+
+        // Función de debug para verificar el formulario de pedidos
+        function debugOrderForm() {
+            const orderTitle = document.getElementById('order-title');
+            if (orderTitle) {
+                console.log('✅ Elemento order-title encontrado:', orderTitle.textContent);
+            } else {
+                console.log('❌ Error: Elemento order-title NO encontrado');
+            }
+            
+            // Verificar si la función selectDay funciona
+            console.log('currentChofer:', currentChofer);
+            console.log('currentDay:', currentDay);
+        }
+
+        // Ejecutar debug después de cargar la página
+        setTimeout(debugOrderForm, 1000);
+
+        // Función de prueba manual para el flujo de pedidos
+        function testOrderFlow() {
+            console.log('🧪 Probando flujo de pedidos...');
+            
+            // Simular selección de chofer
+            currentChofer = 'Chofer 1';
+            console.log('Chofer seleccionado:', currentChofer);
+            
+            // Simular selección de día
+            currentDay = 'LUNES';
+            console.log('Día seleccionado:', currentDay);
+            
+            // Probar actualización del título
+            try {
+                updateOrderTitle();
+                console.log('✅ updateOrderTitle() ejecutada correctamente');
+            } catch (error) {
+                console.log('❌ Error en updateOrderTitle():', error);
+            }
+            
+            // Probar mostrar pantalla de pedidos
+            try {
+                showScreen('order-form');
+                console.log('✅ showScreen("order-form") ejecutada correctamente');
+            } catch (error) {
+                console.log('❌ Error en showScreen():', error);
+            }
+        }
+
+        // Función para limpiar y reiniciar el sistema
+        function resetSystem() {
+            console.log('🔄 Reiniciando sistema...');
+            
+            // Limpiar variables
+            currentChofer = '';
+            currentDay = '';
+            
+            // Volver al menú principal
+            showScreen('main-menu');
+            
+            console.log('✅ Sistema reiniciado');
+        }
+
+        // Hacer funciones disponibles globalmente para debug
+        window.testOrderFlow = testOrderFlow;
+        window.resetSystem = resetSystem;
+        window.debugOrderForm = debugOrderForm;
+
+        // ==================== NUEVAS FUNCIONES PARA REPORTES AVANZADOS ====================
+
+        // Inicializar selectores de año
+        function initializeYearSelector() {
+            const yearSelect = document.getElementById('year-select');
+            const currentYear = new Date().getFullYear();
+            
+            // Agregar años desde hace 2 años hasta el año actual
+            for (let year = currentYear; year >= currentYear - 2; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+            
+            // Seleccionar el mes y año actual por defecto
+            const currentMonth = new Date().getMonth();
+            document.getElementById('month-select').value = currentMonth;
+        }
+
+        // Cargar reporte por vendedor
+        function loadVendorReport() {
+            const contentDiv = document.getElementById('vendor-report-content');
+            
+            if (orders.length === 0) {
+                contentDiv.innerHTML = '<p>No hay pedidos registrados</p>';
+                return;
+            }
+            
+            // Agrupar por vendedor
+            const vendorData = {};
+            
+            orders.forEach(order => {
+                const vendedor = order.vendedor || 'Sin vendedor';
+                if (!vendorData[vendedor]) {
+                    vendorData[vendedor] = {
+                        pedidos: 0,
+                        millares: 0,
+                        ventas: 0,
+                        orders: []
+                    };
+                }
+                
+                vendorData[vendedor].pedidos++;
+                
+                const cantidad = parseFloat(order.cantidad || 0);
+                const esTecho = order.tipoLadrillo === 'H-15' || order.tipoLadrillo === 'H-15 SEG' || 
+                               order.tipoLadrillo === 'H-12' || order.tipoLadrillo === 'H-12 SEG' || 
+                               order.tipoLadrillo === 'H-20';
+                
+                let millares = 0;
+                if (esTecho) {
+                    millares = cantidad / 350;
+                } else {
+                    millares = cantidad / 1000;
+                }
+                
+                vendorData[vendedor].millares += millares;
+                vendorData[vendedor].ventas += parseFloat(order.total || 0);
+                vendorData[vendedor].orders.push(order);
+            });
+            
+            // Generar HTML
+            let html = `
+                <div class="report-summary">
+                    <h3 style="color: var(--primary-color);">Resumen por Vendedor</h3>
+                </div>
+                
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Vendedor</th>
+                            <th>N° Pedidos</th>
+                            <th>Millares</th>
+                            <th>Total Ventas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            Object.keys(vendorData).sort().forEach(vendedor => {
+                const data = vendorData[vendedor];
+                html += `
+                    <tr>
+                        <td><strong>${vendedor}</strong></td>
+                        <td>${data.pedidos}</td>
+                        <td>${data.millares.toFixed(2)}</td>
+                        <td>S/${data.ventas.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            
+            // Totales generales
+            const totalPedidos = Object.values(vendorData).reduce((sum, data) => sum + data.pedidos, 0);
+            const totalMillares = Object.values(vendorData).reduce((sum, data) => sum + data.millares, 0);
+            const totalVentas = Object.values(vendorData).reduce((sum, data) => sum + data.ventas, 0);
+            
+            html += `
+                <div style="margin-top: 30px; padding: 20px; background: var(--bg-light); border-radius: 8px; border: 2px solid var(--border-color);">
+                    <h4 style="color: var(--primary-color);">TOTALES GENERALES</h4>
+                    <div><strong>Total Pedidos:</strong> ${totalPedidos}</div>
+                    <div><strong>Total Millares:</strong> ${totalMillares.toFixed(2)}</div>
+                    <div><strong>Total Ventas:</strong> S/${totalVentas.toFixed(2)}</div>
+                </div>
+            `;
+            
+            contentDiv.innerHTML = html;
+        }
+
+        // Generar reporte por semana
+        function generateWeekReport() {
+            const startDate = document.getElementById('week-start-date').value;
+            const endDate = document.getElementById('week-end-date').value;
+            
+            if (!startDate || !endDate) {
+                alert('Por favor selecciona ambas fechas');
+                return;
+            }
+            
+            const start = new Date(startDate + 'T00:00:00');
+            const end = new Date(endDate + 'T23:59:59');
+            
+            if (start > end) {
+                alert('La fecha de inicio debe ser anterior a la fecha de fin');
+                return;
+            }
+            
+            // Filtrar pedidos y gastos por rango de fechas
+            const filteredOrders = orders.filter(order => {
+                const orderDate = parseDateString(order.fecha);
+                return orderDate >= start && orderDate <= end;
+            });
+            
+            const filteredGastos = gastos.filter(gasto => {
+                const gastoDate = parseDateString(gasto.fecha);
+                return gastoDate >= start && gastoDate <= end;
+            });
+            
+            // Generar reporte
+            generateCustomReport(filteredOrders, filteredGastos, 'week');
+        }
+
+        // Generar reporte por mes
+        function generateMonthReport() {
+            const month = parseInt(document.getElementById('month-select').value);
+            const year = parseInt(document.getElementById('year-select').value);
+            
+            const startDate = new Date(year, month, 1);
+            const endDate = new Date(year, month + 1, 0, 23, 59, 59);
+            
+            // Filtrar pedidos y gastos por mes
+            const filteredOrders = orders.filter(order => {
+                const orderDate = parseDateString(order.fecha);
+                return orderDate >= startDate && orderDate <= endDate;
+            });
+            
+            const filteredGastos = gastos.filter(gasto => {
+                const gastoDate = parseDateString(gasto.fecha);
+                return gastoDate >= startDate && gastoDate <= endDate;
+            });
+            
+            // Generar reporte
+            generateCustomReport(filteredOrders, filteredGastos, 'month');
+        }
+
+        // Función auxiliar para parsear fechas en formato local
+        function parseDateString(dateStr) {
+            // Formato esperado: dd/mm/yyyy o similar
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                // Asumiendo formato dd/mm/yyyy
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            // Si no se puede parsear, retornar fecha inválida
+            return new Date(dateStr);
+        }
+
+        // Generar reporte personalizado
+        function generateCustomReport(filteredOrders, filteredGastos, type) {
+            const prefix = type; // 'week' o 'month'
+            
+            if (filteredOrders.length === 0 && filteredGastos.length === 0) {
+                alert('No hay datos para el período seleccionado');
+                return;
+            }
+            
+            // Agrupar por chofer
+            const choferData = {};
+            let totalMillares = 0;
+            let ventaTotal = 0;
+            let costoFabricaTotal = 0;
+            
+            // Procesar pedidos
+            filteredOrders.forEach(order => {
+                const chofer = order.chofer;
+                if (!choferData[chofer]) {
+                    choferData[chofer] = {
+                        millares: 0,
+                        costoFabrica: 0,
+                        gastos: 0,
+                        petroleo: 0,
+                        pagoChofer: 0,
+                        ventas: 0
+                    };
+                }
+                
+                const cantidad = parseFloat(order.cantidad || 0);
+                const esTecho = order.tipoLadrillo === 'H-15' || order.tipoLadrillo === 'H-15 SEG' || 
+                               order.tipoLadrillo === 'H-12' || order.tipoLadrillo === 'H-12 SEG' || 
+                               order.tipoLadrillo === 'H-20';
+                
+                let millares = 0;
+                if (esTecho) {
+                    millares = cantidad / 350;
+                } else {
+                    millares = cantidad / 1000;
+                }
+                
+                choferData[chofer].millares += millares;
+                totalMillares += millares;
+                
+                const fabrica = order.fabrica;
+                const tipoLadrillo = order.tipoLadrillo;
+                const precioPlanta = preciosPlanta[fabrica] && preciosPlanta[fabrica][tipoLadrillo] 
+                    ? preciosPlanta[fabrica][tipoLadrillo] 
+                    : 0;
+                const costoFabricaOrder = millares * precioPlanta * 1000;
+                
+                choferData[chofer].costoFabrica += costoFabricaOrder;
+                costoFabricaTotal += costoFabricaOrder;
+                
+                const pagoChoferOrder = millares * 59;
+                choferData[chofer].pagoChofer += pagoChoferOrder;
+                
+                const ventasOrder = parseFloat(order.total || 0);
+                choferData[chofer].ventas += ventasOrder;
+                ventaTotal += ventasOrder;
+            });
+            
+            // Procesar gastos
+            filteredGastos.forEach(gasto => {
+                const chofer = gasto.chofer;
+                if (!choferData[chofer]) {
+                    choferData[chofer] = {
+                        millares: 0,
+                        costoFabrica: 0,
+                        gastos: 0,
+                        petroleo: 0,
+                        pagoChofer: 0,
+                        ventas: 0
+                    };
+                }
+                
+                choferData[chofer].gastos += gasto.totalGastos || 0;
+                choferData[chofer].petroleo += gasto.petroleo || 0;
+            });
+            
+            // Calcular totales
+            const totalGastos = Object.values(choferData).reduce((sum, data) => sum + data.gastos, 0);
+            const totalPagoChoferes = totalMillares * 59;
+            const gananciaTotal = ventaTotal - costoFabricaTotal - totalGastos - totalPagoChoferes;
+            
+            // Actualizar resumen
+            document.getElementById(`${prefix}-total-millares`).textContent = totalMillares.toFixed(2);
+            document.getElementById(`${prefix}-venta-total`).textContent = 'S/' + ventaTotal.toFixed(2);
+            document.getElementById(`${prefix}-costo-fabrica`).textContent = 'S/' + costoFabricaTotal.toFixed(2);
+            document.getElementById(`${prefix}-ganancia-choferes`).textContent = 'S/' + totalPagoChoferes.toFixed(2);
+            document.getElementById(`${prefix}-total-gastos`).textContent = 'S/' + totalGastos.toFixed(2);
+            document.getElementById(`${prefix}-ganancia-total`).textContent = 'S/' + Math.abs(gananciaTotal).toFixed(2);
+            
+            // Generar tabla
+            let tableHTML = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Millares</th>
+                            <th>Costo Fábrica</th>
+                            <th>Gastos</th>
+                            <th>Petroleo</th>
+                            <th>Pago Chofer</th>
+                            <th>Ventas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            Object.keys(choferData).forEach(chofer => {
+                const data = choferData[chofer];
+                tableHTML += `
+                    <tr>
+                        <td><strong>${chofer}</strong></td>
+                        <td>${data.millares.toFixed(2)}</td>
+                        <td>S/${data.costoFabrica.toFixed(2)}</td>
+                        <td>S/${data.gastos.toFixed(2)}</td>
+                        <td>S/${data.petroleo.toFixed(2)}</td>
+                        <td>S/${data.pagoChofer.toFixed(2)}</td>
+                        <td>S/${data.ventas.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table>';
+            
+            document.getElementById(`${prefix}-report-table-container`).innerHTML = tableHTML;
+            document.getElementById(`${prefix}-report-results`).style.display = 'block';
+        }
+
+        // Funciones de impresión para nuevos reportes
+        function printVendorReport() {
+            const contentDiv = document.getElementById('vendor-report-content');
+            const today = new Date();
+            const fechaReporte = today.toLocaleDateString('es-ES');
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Reporte por Vendedor - Ladrillería</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                            th { background-color: #8B1538; color: white; font-weight: bold; }
+                            h1, h3 { color: #8B1538; }
+                            @media print {
+                                body { margin: 0; }
+                                @page { margin: 1cm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1 style="text-align: center;">REPORTE POR VENDEDOR - LADRILLERÍA</h1>
+                        <p style="text-align: center;"><strong>Fecha del Reporte:</strong> ${fechaReporte}</p>
+                        ${contentDiv.innerHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function printWeekReport() {
+            printCustomReport('week', 'REPORTE SEMANAL');
+        }
+
+        function printMonthReport() {
+            printCustomReport('month', 'REPORTE MENSUAL');
+        }
+
+        function printCustomReport(type, title) {
+            const startDate = type === 'week' ? document.getElementById('week-start-date').value : '';
+            const endDate = type === 'week' ? document.getElementById('week-end-date').value : '';
+            const month = type === 'month' ? document.getElementById('month-select').selectedOptions[0].text : '';
+            const year = type === 'month' ? document.getElementById('year-select').value : '';
+            
+            const periodo = type === 'week' 
+                ? `Del ${startDate} al ${endDate}`
+                : `${month} ${year}`;
+            
+            const summaryHTML = document.getElementById(`${type}-report-results`).querySelector('.report-summary').outerHTML;
+            const tableHTML = document.getElementById(`${type}-report-table-container`).innerHTML;
+            
+            const today = new Date();
+            const fechaReporte = today.toLocaleDateString('es-ES');
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>${title} - Ladrillería</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                            th { background-color: #8B1538; color: white; font-weight: bold; }
+                            h1, h3 { color: #8B1538; }
+                            .report-summary { background: #FAF6F7; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+                            @media print {
+                                body { margin: 0; }
+                                @page { margin: 1cm; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1 style="text-align: center;">${title} - LADRILLERÍA</h1>
+                        <p style="text-align: center;"><strong>Período:</strong> ${periodo}</p>
+                        <p style="text-align: center;"><strong>Fecha del Reporte:</strong> ${fechaReporte}</p>
+                        ${summaryHTML}
+                        ${tableHTML}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Actualizar función showScreen para cargar datos según la pantalla
+        const originalShowScreen = showScreen;
+        showScreen = function(screenId) {
+            originalShowScreen(screenId);
+            
+            // Cargar datos específicos según la pantalla
+            if (screenId === 'report-by-vendor') {
+                loadVendorReport();
+            } else if (screenId === 'report-by-month-filter' && !document.getElementById('year-select').options.length) {
+                initializeYearSelector();
+            } else if (screenId === 'export-data') {
+                loadExportCounts();
+            } else if (screenId === 'cloud-sync') {
+                loadCloudSyncScreen();
+            }
+        };
+
+        // ==================== FUNCIONES DE EXPORTACIÓN ====================
+
+        // Cargar contadores de datos
+        function loadExportCounts() {
+            document.getElementById('export-orders-count').textContent = orders.length;
+            document.getElementById('export-gastos-count').textContent = gastos.length;
+        }
+
+        // Convertir a CSV
+        function convertToCSV(data, headers) {
+            if (data.length === 0) return '';
+            
+            let csv = headers.join(',') + '\n';
+            
+            data.forEach(row => {
+                const values = headers.map(header => {
+                    const value = row[header] || '';
+                    // Escapar comas y comillas en los valores
+                    return '"' + String(value).replace(/"/g, '""') + '"';
+                });
+                csv += values.join(',') + '\n';
+            });
+            
+            return csv;
+        }
+
+        // Descargar archivo
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Exportar pedidos a Excel (CSV)
+        function exportPedidosToExcel() {
+            if (orders.length === 0) {
+                showExportMessage('ℹ️ No hay pedidos para exportar', 'info');
+                return;
+            }
+            
+            const headers = ['fecha', 'cantidad', 'tipoLadrillo', 'fabrica', 'chofer', 'dia', 
+                           'precioUnitario', 'precioMillar', 'total', 'formaPago', 'numeroOperacion', 'vendedor'];
+            
+            const csv = convertToCSV(orders, headers);
+            const today = new Date().toISOString().split('T')[0];
+            downloadFile(csv, `Pedidos_${today}.csv`, 'text/csv;charset=utf-8;');
+            
+            showExportMessage('✅ Archivo descargado: Pedidos_' + today + '.csv (' + orders.length + ' registros)', 'success');
+        }
+
+        // Exportar gastos a Excel (CSV)
+        function exportGastosToExcel() {
+            if (gastos.length === 0) {
+                showExportMessage('ℹ️ No hay gastos para exportar', 'info');
+                return;
+            }
+            
+            const headers = ['fecha', 'chofer', 'dia', 'petroleo', 'otrosDescripcion', 'otrosCantidad'];
+            
+            const csv = convertToCSV(gastos, headers);
+            const today = new Date().toISOString().split('T')[0];
+            downloadFile(csv, `Gastos_${today}.csv`, 'text/csv;charset=utf-8;');
+            
+            showExportMessage('✅ Archivo descargado: Gastos_' + today + '.csv (' + gastos.length + ' registros)', 'success');
+        }
+
+        // Exportar todo (pedidos y gastos en archivos separados)
+        function exportAllToExcel() {
+            if (orders.length === 0 && gastos.length === 0) {
+                showExportMessage('ℹ️ No hay datos para exportar', 'info');
+                return;
+            }
+            
+            let exported = [];
+            
+            if (orders.length > 0) {
+                const headersOrders = ['fecha', 'cantidad', 'tipoLadrillo', 'fabrica', 'chofer', 'dia', 
+                                      'precioUnitario', 'precioMillar', 'total', 'formaPago', 'numeroOperacion', 'vendedor'];
+                const csvOrders = convertToCSV(orders, headersOrders);
+                const today = new Date().toISOString().split('T')[0];
+                downloadFile(csvOrders, `Pedidos_${today}.csv`, 'text/csv;charset=utf-8;');
+                exported.push(orders.length + ' pedidos');
+            }
+            
+            if (gastos.length > 0) {
+                // Pequeño delay para que no se bloquee la descarga
+                setTimeout(() => {
+                    const headersGastos = ['fecha', 'chofer', 'dia', 'petroleo', 'otrosDescripcion', 'otrosCantidad'];
+                    const csvGastos = convertToCSV(gastos, headersGastos);
+                    const today = new Date().toISOString().split('T')[0];
+                    downloadFile(csvGastos, `Gastos_${today}.csv`, 'text/csv;charset=utf-8;');
+                }, 500);
+                exported.push(gastos.length + ' gastos');
+            }
+            
+            showExportMessage('✅ Archivos descargados: ' + exported.join(' y '), 'success');
+        }
+
+        // Mostrar mensajes de exportación
+        function showExportMessage(message, type) {
+            const element = document.getElementById('export-status');
+            element.style.display = 'block';
+            element.textContent = message;
+            
+            // Colores según tipo
+            if (type === 'success') {
+                element.style.background = '#d4edda';
+                element.style.color = '#155724';
+                element.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                element.style.background = '#f8d7da';
+                element.style.color = '#721c24';
+                element.style.border = '1px solid #f5c6cb';
+            } else if (type === 'info') {
+                element.style.background = '#d1ecf1';
+                element.style.color = '#0c5460';
+                element.style.border = '1px solid #bee5eb';
+            }
+            
+            // Auto-ocultar después de 7 segundos
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 7000);
+        }
+
+        // ==================== FIN FUNCIONES DE EXPORTACIÓN ====================
+
+        // ==================== FUNCIONES DE SINCRONIZACIÓN EN LA NUBE ====================
+
+        // Configuración de Firebase (hardcoded - sincronización automática invisible)
+        let firebaseConfig = {
+            apiKey: "AIzaSyA1oBwgXD_R_2KHqKvtRE248QiCtu4uoRA",
+            databaseURL: "https://ladrilleria-c5d8a-default-rtdb.firebaseio.com",
+            projectId: "ladrilleria-c5d8a"
+        };
+        let autoSyncEnabled = true; // Siempre activado
+        let autoSyncInterval = null;
+
+        // Cargar pantalla de sincronización
+        function loadCloudSyncScreen() {
+            // Cargar configuración guardada
+            const savedConfig = localStorage.getItem('firebaseConfig');
+            if (savedConfig) {
+                try {
+                    firebaseConfig = JSON.parse(savedConfig);
+                    document.getElementById('firebase-apiKey').value = firebaseConfig.apiKey || '';
+                    document.getElementById('firebase-databaseURL').value = firebaseConfig.databaseURL || '';
+                    document.getElementById('firebase-projectId').value = firebaseConfig.projectId || '';
+                    
+                    updateFirebaseStatus(true);
+                    document.getElementById('sync-panel').style.display = 'block';
+                } catch (e) {
+                    console.error('Error cargando configuración:', e);
+                }
+            }
+            
+            // Actualizar contadores
+            document.getElementById('local-count').textContent = orders.length + gastos.length;
+            
+            // Verificar auto-sync
+            const autoSync = localStorage.getItem('autoSyncEnabled');
+            if (autoSync === 'true') {
+                autoSyncEnabled = true;
+                document.getElementById('auto-sync-status').textContent = 'Activada ✅';
+            }
+        }
+
+        // Guardar configuración de Firebase
+        function saveFirebaseConfig() {
+            const apiKey = document.getElementById('firebase-apiKey').value.trim();
+            const databaseURL = document.getElementById('firebase-databaseURL').value.trim();
+            const projectId = document.getElementById('firebase-projectId').value.trim();
+            
+            if (!apiKey || !databaseURL || !projectId) {
+                showCloudMessage('⚠️ Por favor completa todos los campos', 'error');
+                return;
+            }
+            
+            if (!databaseURL.includes('firebaseio.com') && !databaseURL.includes('firebasedatabase.app')) {
+                showCloudMessage('⚠️ La URL de la base de datos no parece válida', 'error');
+                return;
+            }
+            
+            firebaseConfig = {
+                apiKey: apiKey,
+                databaseURL: databaseURL,
+                projectId: projectId
+            };
+            
+            localStorage.setItem('firebaseConfig', JSON.stringify(firebaseConfig));
+            showCloudMessage('✅ Configuración guardada correctamente', 'success');
+            updateFirebaseStatus(true);
+            document.getElementById('sync-panel').style.display = 'block';
+        }
+
+        // Actualizar estado de Firebase
+        function updateFirebaseStatus(configured) {
+            const statusDiv = document.getElementById('firebase-config-status');
+            const statusText = document.getElementById('firebase-status-text');
+            const statusDesc = document.getElementById('firebase-status-desc');
+            
+            if (configured) {
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.borderColor = '#c3e6cb';
+                statusText.textContent = 'Configurado ✅';
+                statusText.style.color = '#155724';
+                statusDesc.textContent = 'La sincronización está lista para usar';
+                statusDesc.style.color = '#155724';
+            } else {
+                statusDiv.style.background = '#fff3cd';
+                statusDiv.style.borderColor = '#ffc107';
+                statusText.textContent = 'No Configurado';
+                statusText.style.color = '#856404';
+                statusDesc.textContent = 'Configura Firebase para habilitar la sincronización';
+                statusDesc.style.color = '#666';
+            }
+        }
+
+        // Probar conexión con Firebase
+        async function testFirebaseConnection() {
+            if (!firebaseConfig) {
+                showCloudMessage('⚠️ Primero debes guardar la configuración', 'error');
+                return;
+            }
+            
+            showCloudMessage('🔄 Probando conexión...', 'info');
+            
+            try {
+                const testUrl = firebaseConfig.databaseURL + '/test.json';
+                const response = await fetch(testUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ timestamp: new Date().toISOString() })
+                });
+                
+                if (response.ok) {
+                    showCloudMessage('✅ Conexión exitosa con Firebase', 'success');
+                } else {
+                    showCloudMessage('❌ Error de conexión. Verifica la configuración', 'error');
+                }
+            } catch (error) {
+                showCloudMessage('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Subir datos a la nube
+        async function syncToCloud() {
+            if (!firebaseConfig) {
+                showCloudMessage('⚠️ Configura Firebase primero', 'error');
+                return;
+            }
+            
+            showCloudMessage('🔄 Subiendo datos a la nube...', 'info');
+            
+            try {
+                const data = {
+                    orders: orders,
+                    gastos: gastos,
+                    lastSync: new Date().toISOString(),
+                    totalRecords: orders.length + gastos.length
+                };
+                
+                const url = firebaseConfig.databaseURL + '/ladrilleria.json';
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showCloudMessage('✅ Datos sincronizados: ' + orders.length + ' pedidos y ' + gastos.length + ' gastos', 'success');
+                } else {
+                    showCloudMessage('❌ Error al subir datos', 'error');
+                }
+            } catch (error) {
+                showCloudMessage('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Descargar datos de la nube
+        async function syncFromCloud() {
+            if (!firebaseConfig) {
+                showCloudMessage('⚠️ Configura Firebase primero', 'error');
+                return;
+            }
+            
+            showCloudMessage('🔄 Descargando datos de la nube...', 'info');
+            
+            try {
+                const url = firebaseConfig.databaseURL + '/ladrilleria.json';
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    showCloudMessage('❌ Error al descargar datos', 'error');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (!data || !data.orders || !data.gastos) {
+                    showCloudMessage('ℹ️ No hay datos en la nube aún', 'info');
+                    return;
+                }
+                
+                // Preguntar si quiere reemplazar o combinar
+                const replace = confirm(
+                    '¿Cómo quieres sincronizar?\n\n' +
+                    '✅ ACEPTAR = Reemplazar datos locales con los de la nube\n' +
+                    '❌ CANCELAR = Mantener datos locales\n\n' +
+                    'Datos en la nube: ' + data.orders.length + ' pedidos, ' + data.gastos.length + ' gastos'
+                );
+                
+                if (replace) {
+                    orders = data.orders;
+                    gastos = data.gastos;
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    localStorage.setItem('gastos', JSON.stringify(gastos));
+                    showCloudMessage('✅ Datos sincronizados desde la nube: ' + orders.length + ' pedidos, ' + gastos.length + ' gastos', 'success');
+                    document.getElementById('local-count').textContent = orders.length + gastos.length;
+                }
+            } catch (error) {
+                showCloudMessage('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Activar/Desactivar sincronización automática
+        function enableAutoSync() {
+            if (!firebaseConfig) {
+                showCloudMessage('⚠️ Configura Firebase primero', 'error');
+                return;
+            }
+            
+            autoSyncEnabled = !autoSyncEnabled;
+            localStorage.setItem('autoSyncEnabled', autoSyncEnabled.toString());
+            
+            if (autoSyncEnabled) {
+                document.getElementById('auto-sync-status').textContent = 'Activada ✅';
+                showCloudMessage('✅ Sincronización automática activada (cada 5 minutos)', 'success');
+                
+                // Sincronizar inmediatamente
+                syncToCloud();
+                
+                // Configurar intervalo de 5 minutos
+                autoSyncInterval = setInterval(() => {
+                    syncToCloud();
+                }, 5 * 60 * 1000);
+            } else {
+                document.getElementById('auto-sync-status').textContent = 'Desactivada';
+                showCloudMessage('ℹ️ Sincronización automática desactivada', 'info');
+                
+                if (autoSyncInterval) {
+                    clearInterval(autoSyncInterval);
+                    autoSyncInterval = null;
+                }
+            }
+        }
+
+        // Mostrar mensajes de sincronización
+        function showCloudMessage(message, type) {
+            const element = document.getElementById('cloud-sync-status');
+            element.style.display = 'block';
+            element.textContent = message;
+            
+            if (type === 'success') {
+                element.style.background = '#d4edda';
+                element.style.color = '#155724';
+                element.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                element.style.background = '#f8d7da';
+                element.style.color = '#721c24';
+                element.style.border = '1px solid #f5c6cb';
+            } else if (type === 'info') {
+                element.style.background = '#d1ecf1';
+                element.style.color = '#0c5460';
+                element.style.border = '1px solid #bee5eb';
+            }
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 7000);
+        }
+
+        // Auto-sincronizar al guardar pedido o gasto (completamente invisible)
+        const originalSaveOrder = saveOrder;
+        saveOrder = function() {
+            originalSaveOrder();
+            // Sincronizar automáticamente después de guardar
+            setTimeout(() => syncToCloudQuietly(), 1000);
+        };
+
+        const originalSaveGastos = saveGastos;
+        saveGastos = function() {
+            originalSaveGastos();
+            // Sincronizar automáticamente después de guardar
+            setTimeout(() => syncToCloudQuietly(), 1000);
+        };
+
+        // Iniciar auto-sync automáticamente (completamente invisible)
+        window.addEventListener('load', function() {
+            // Iniciar sincronización automática sin preguntar
+            setTimeout(() => {
+                startAutoSync();
+            }, 2000); // Espera 2 segundos después de cargar
+        });
+
+        // Función para iniciar auto-sync
+        function startAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+            }
+            
+            autoSyncInterval = setInterval(() => {
+                syncToCloudQuietly();
+            }, 5 * 60 * 1000); // Cada 5 minutos
+            
+            // Sincronizar inmediatamente
+            syncToCloudQuietly();
+        }
+
+        // Sincronizar silenciosamente (completamente invisible)
+        async function syncToCloudQuietly() {
+            if (!firebaseConfig) return;
+            
+            try {
+                const data = {
+                    orders: orders,
+                    gastos: gastos,
+                    lastSync: new Date().toISOString(),
+                    totalRecords: orders.length + gastos.length
+                };
+                
+                const url = firebaseConfig.databaseURL + '/ladrilleria.json';
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                // Sincronización exitosa (silenciosa, sin notificaciones)
+                if (response.ok) {
+                    console.log('Datos sincronizados en la nube');
+                }
+            } catch (error) {
+                // Error silencioso, solo en consola
+                console.error('Error en sincronización:', error);
+            }
+        }
+
+        // enableAutoSync no se usa más (sincronización siempre activada)
+        function enableAutoSync() {
+            // Función vacía - la sincronización siempre está activada
+            return;
+        }
+
+        // ==================== FIN FUNCIONES DE SINCRONIZACIÓN EN LA NUBE ====================
+
+        // ==================== FIN DE NUEVAS FUNCIONES ====================
+    </script>
+</body>
+</html>

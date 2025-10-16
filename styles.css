@@ -324,13 +324,14 @@ body {
     border-collapse: collapse;
     margin-top: 20px;
     font-size: 12px;
+    table-layout: fixed;
 }
 
 .results-table thead,
 .results-table tbody {
     display: table;
     width: 100%;
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 .results-table th,
@@ -341,6 +342,22 @@ body {
     white-space: nowrap;
     min-width: 80px;
 }
+
+/* Anchos específicos para columnas del reporte general */
+.results-table th:nth-child(1),
+.results-table td:nth-child(1) { width: 15%; } /* Nombre */
+.results-table th:nth-child(2),
+.results-table td:nth-child(2) { width: 12%; } /* Millares */
+.results-table th:nth-child(3),
+.results-table td:nth-child(3) { width: 15%; } /* Costo Fábrica */
+.results-table th:nth-child(4),
+.results-table td:nth-child(4) { width: 12%; } /* Gastos */
+.results-table th:nth-child(5),
+.results-table td:nth-child(5) { width: 12%; } /* Petroleo */
+.results-table th:nth-child(6),
+.results-table td:nth-child(6) { width: 12%; } /* Pago Chofer */
+.results-table th:nth-child(7),
+.results-table td:nth-child(7) { width: 22%; } /* Ventas */
 
 .results-table th {
     background: var(--primary-color);
@@ -437,13 +454,14 @@ body {
     border-collapse: collapse;
     font-size: 11px;
     margin-top: 20px;
+    table-layout: fixed;
 }
 
 .view-orders-table thead,
 .view-orders-table tbody {
     display: table;
     width: 100%;
-    table-layout: auto;
+    table-layout: fixed;
 }
 
 .view-orders-table th,
@@ -454,6 +472,44 @@ body {
     white-space: nowrap;
     min-width: 70px;
 }
+
+/* Anchos específicos para columnas de pedidos */
+.view-orders-table th:nth-child(1),
+.view-orders-table td:nth-child(1) { width: 8%; } /* ID */
+.view-orders-table th:nth-child(2),
+.view-orders-table td:nth-child(2) { width: 10%; } /* Fecha */
+.view-orders-table th:nth-child(3),
+.view-orders-table td:nth-child(3) { width: 12%; } /* Chofer */
+.view-orders-table th:nth-child(4),
+.view-orders-table td:nth-child(4) { width: 10%; } /* Día */
+.view-orders-table th:nth-child(5),
+.view-orders-table td:nth-child(5) { width: 10%; } /* Cantidad */
+.view-orders-table th:nth-child(6),
+.view-orders-table td:nth-child(6) { width: 12%; } /* Tipo Ladrillo */
+.view-orders-table th:nth-child(7),
+.view-orders-table td:nth-child(7) { width: 10%; } /* Precio Millar */
+.view-orders-table th:nth-child(8),
+.view-orders-table td:nth-child(8) { width: 10%; } /* Total */
+.view-orders-table th:nth-child(9),
+.view-orders-table td:nth-child(9) { width: 10%; } /* Forma Pago */
+.view-orders-table th:nth-child(10),
+.view-orders-table td:nth-child(10) { width: 8%; } /* N° Operación */
+
+/* Anchos específicos para columnas de gastos */
+.view-orders-table.gastos-table th:nth-child(1),
+.view-orders-table.gastos-table td:nth-child(1) { width: 10%; } /* ID */
+.view-orders-table.gastos-table th:nth-child(2),
+.view-orders-table.gastos-table td:nth-child(2) { width: 12%; } /* Fecha */
+.view-orders-table.gastos-table th:nth-child(3),
+.view-orders-table.gastos-table td:nth-child(3) { width: 15%; } /* Chofer */
+.view-orders-table.gastos-table th:nth-child(4),
+.view-orders-table.gastos-table td:nth-child(4) { width: 12%; } /* Día */
+.view-orders-table.gastos-table th:nth-child(5),
+.view-orders-table.gastos-table td:nth-child(5) { width: 15%; } /* Petroleo */
+.view-orders-table.gastos-table th:nth-child(6),
+.view-orders-table.gastos-table td:nth-child(6) { width: 20%; } /* Otros - Descripción */
+.view-orders-table.gastos-table th:nth-child(7),
+.view-orders-table.gastos-table td:nth-child(7) { width: 16%; } /* Otros - Cantidad */
 
 .view-orders-table th {
     background: var(--primary-color);

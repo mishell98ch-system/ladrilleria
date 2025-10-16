@@ -744,7 +744,7 @@ function loadOrdersViewer() {
     if (weeklyGastos.length > 0) {
         html += `
             <h4>💰 GASTOS DE ESTA SEMANA (${weeklyGastos.length} registros)</h4>
-            <table class="view-orders-table">
+            <table class="view-orders-table gastos-table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -1704,7 +1704,7 @@ function generateCustomReport(filteredOrders, filteredGastos, type) {
         gastosTableHTML = `
             <div class="report-summary" style="background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color); margin-bottom: 20px;">
                 <h3 style="color: var(--primary-color);">💰 GASTOS (${filteredGastos.length} registros)</h3>
-                <table class="view-orders-table">
+                <table class="view-orders-table gastos-table">
                     <thead>
                         <tr>
                             <th>ID</th>

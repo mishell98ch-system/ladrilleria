@@ -1254,6 +1254,7 @@ function resetSystem() {
 window.testOrderFlow = testOrderFlow;
 window.resetSystem = resetSystem;
 window.debugOrderForm = debugOrderForm;
+window.fixCorruptedGastosData = fixCorruptedGastosData;
 
 // ==================== NUEVAS FUNCIONES PARA REPORTES AVANZADOS ====================
 
@@ -1385,15 +1386,26 @@ function generateWeekReport() {
     }
     
     // Filtrar pedidos y gastos por rango de fechas
+    console.log('Filtrando por fechas:', start.toLocaleDateString(), 'a', end.toLocaleDateString());
+    console.log('Total pedidos antes del filtro:', orders.length);
+    console.log('Total gastos antes del filtro:', gastos.length);
+    
     const filteredOrders = orders.filter(order => {
         const orderDate = parseDateString(order.fecha);
-        return orderDate >= start && orderDate <= end;
+        const inRange = orderDate >= start && orderDate <= end;
+        if (inRange) console.log('Pedido incluido:', order.fecha, order.chofer);
+        return inRange;
     });
     
     const filteredGastos = gastos.filter(gasto => {
         const gastoDate = parseDateString(gasto.fecha);
-        return gastoDate >= start && gastoDate <= end;
+        const inRange = gastoDate >= start && gastoDate <= end;
+        if (inRange) console.log('Gasto incluido:', gasto.fecha, gasto.chofer);
+        return inRange;
     });
+    
+    console.log('Pedidos filtrados:', filteredOrders.length);
+    console.log('Gastos filtrados:', filteredGastos.length);
     
     // Generar reporte
     generateCustomReport(filteredOrders, filteredGastos, 'week');
@@ -1408,15 +1420,26 @@ function generateMonthReport() {
     const endDate = new Date(year, month + 1, 0, 23, 59, 59);
     
     // Filtrar pedidos y gastos por mes
+    console.log('Filtrando por mes:', startDate.toLocaleDateString(), 'a', endDate.toLocaleDateString());
+    console.log('Total pedidos antes del filtro:', orders.length);
+    console.log('Total gastos antes del filtro:', gastos.length);
+    
     const filteredOrders = orders.filter(order => {
         const orderDate = parseDateString(order.fecha);
-        return orderDate >= startDate && orderDate <= endDate;
+        const inRange = orderDate >= startDate && orderDate <= endDate;
+        if (inRange) console.log('Pedido incluido:', order.fecha, order.chofer);
+        return inRange;
     });
     
     const filteredGastos = gastos.filter(gasto => {
         const gastoDate = parseDateString(gasto.fecha);
-        return gastoDate >= startDate && gastoDate <= endDate;
+        const inRange = gastoDate >= startDate && gastoDate <= endDate;
+        if (inRange) console.log('Gasto incluido:', gasto.fecha, gasto.chofer);
+        return inRange;
     });
+    
+    console.log('Pedidos filtrados:', filteredOrders.length);
+    console.log('Gastos filtrados:', filteredGastos.length);
     
     // Generar reporte
     generateCustomReport(filteredOrders, filteredGastos, 'month');
@@ -1428,15 +1451,24 @@ function parseDateString(dateStr) {
     const parts = dateStr.split('/');
     if (parts.length === 3) {
         // Asumiendo formato dd/mm/yyyy
-        return new Date(parts[2], parts[1] - 1, parts[0]);
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // Los meses en JS van de 0-11
+        const year = parseInt(parts[2]);
+        
+        const date = new Date(year, month, day);
+        console.log('Parseando fecha:', dateStr, '->', date.toLocaleDateString());
+        return date;
     }
     // Si no se puede parsear, retornar fecha inválida
+    console.log('Error parseando fecha:', dateStr);
     return new Date(dateStr);
 }
 
 // Generar reporte personalizado
 function generateCustomReport(filteredOrders, filteredGastos, type) {
     const prefix = type; // 'week' o 'month'
+    
+    console.log(`Generando reporte ${type}:`, filteredOrders.length, 'pedidos,', filteredGastos.length, 'gastos');
     
     if (filteredOrders.length === 0 && filteredGastos.length === 0) {
         alert('No hay datos para el período seleccionado');
@@ -1527,26 +1559,28 @@ function generateCustomReport(filteredOrders, filteredGastos, type) {
     document.getElementById(`${prefix}-total-gastos`).textContent = 'S/' + totalGastos.toFixed(2);
     document.getElementById(`${prefix}-ganancia-total`).textContent = 'S/' + Math.abs(gananciaTotal).toFixed(2);
     
-    // Generar tabla
-    let tableHTML = `
-        <table class="results-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Millares</th>
-                    <th>Costo Fábrica</th>
-                    <th>Gastos</th>
-                    <th>Petroleo</th>
-                    <th>Pago Chofer</th>
-                    <th>Ventas</th>
-                </tr>
-            </thead>
-            <tbody>
+    // Generar tabla resumen por chofer
+    let summaryTableHTML = `
+        <div class="report-summary" style="background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color); margin-bottom: 20px;">
+            <h3 style="color: var(--primary-color);">Resumen por Chofer</h3>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Millares</th>
+                        <th>Costo Fábrica</th>
+                        <th>Gastos</th>
+                        <th>Petroleo</th>
+                        <th>Pago Chofer</th>
+                        <th>Ventas</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
     
     Object.keys(choferData).forEach(chofer => {
         const data = choferData[chofer];
-        tableHTML += `
+        summaryTableHTML += `
             <tr>
                 <td><strong>${chofer}</strong></td>
                 <td>${data.millares.toFixed(2)}</td>
@@ -1559,9 +1593,100 @@ function generateCustomReport(filteredOrders, filteredGastos, type) {
         `;
     });
     
-    tableHTML += '</tbody></table>';
+    summaryTableHTML += '</tbody></table></div>';
     
-    document.getElementById(`${prefix}-report-table-container`).innerHTML = tableHTML;
+    // Generar tabla detallada de pedidos
+    let ordersTableHTML = '';
+    if (filteredOrders.length > 0) {
+        ordersTableHTML = `
+            <div class="report-summary" style="background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color); margin-bottom: 20px;">
+                <h3 style="color: var(--primary-color);">📋 PEDIDOS (${filteredOrders.length} pedidos)</h3>
+                <table class="view-orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Chofer</th>
+                            <th>Día</th>
+                            <th>Cantidad</th>
+                            <th>Tipo Ladrillo</th>
+                            <th>Precio Millar</th>
+                            <th>Total</th>
+                            <th>Forma Pago</th>
+                            <th>N° Operación</th>
+                            <th>Fábrica</th>
+                            <th>Vendedor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        filteredOrders.forEach(order => {
+            ordersTableHTML += `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.fecha}</td>
+                    <td>${order.chofer}</td>
+                    <td>${order.dia}</td>
+                    <td>${order.cantidad}</td>
+                    <td>${order.tipoLadrillo}</td>
+                    <td>${order.precioMillar || '0.00'}</td>
+                    <td>S/${parseFloat(order.total || 0).toFixed(2)}</td>
+                    <td>${order.formaPago}</td>
+                    <td>${order.numOperacion || '-'}</td>
+                    <td>${order.fabrica}</td>
+                    <td>${order.vendedor}</td>
+                </tr>
+            `;
+        });
+        
+        ordersTableHTML += '</tbody></table></div>';
+    }
+    
+    // Generar tabla detallada de gastos
+    let gastosTableHTML = '';
+    if (filteredGastos.length > 0) {
+        gastosTableHTML = `
+            <div class="report-summary" style="background: var(--bg-light); padding: 20px; border-radius: 8px; border: 2px solid var(--border-color); margin-bottom: 20px;">
+                <h3 style="color: var(--primary-color);">💰 GASTOS (${filteredGastos.length} registros)</h3>
+                <table class="view-orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Chofer</th>
+                            <th>Día</th>
+                            <th>Petroleo (S/.)</th>
+                            <th>Otros - Descripción</th>
+                            <th>Otros - Cantidad (S/.)</th>
+                            <th>Total Gastos (S/.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        filteredGastos.forEach(gasto => {
+            gastosTableHTML += `
+                <tr>
+                    <td>${gasto.id}</td>
+                    <td>${gasto.fecha}</td>
+                    <td>${gasto.chofer}</td>
+                    <td>${gasto.dia}</td>
+                    <td>S/${gasto.petroleo.toFixed(2)}</td>
+                    <td>${gasto.otrosDescripcion || '-'}</td>
+                    <td>S/${gasto.otrosCantidad.toFixed(2)}</td>
+                    <td><strong>S/${gasto.totalGastos.toFixed(2)}</strong></td>
+                </tr>
+            `;
+        });
+        
+        gastosTableHTML += '</tbody></table></div>';
+    }
+    
+    // Combinar todas las tablas
+    const allTablesHTML = summaryTableHTML + ordersTableHTML + gastosTableHTML;
+    
+    document.getElementById(`${prefix}-report-table-container`).innerHTML = allTablesHTML;
     document.getElementById(`${prefix}-report-results`).style.display = 'block';
 }
 
@@ -2064,5 +2189,56 @@ function enableAutoSync() {
 }
 
 // ==================== FIN FUNCIONES DE SINCRONIZACIÓN EN LA NUBE ====================
+
+// ==================== FUNCIÓN PARA CORREGIR DATOS CORRUPTOS ====================
+
+// Función para corregir datos de gastos que puedan estar mal guardados
+function fixCorruptedGastosData() {
+    let fixed = false;
+    
+    gastos.forEach(gasto => {
+        // Si otrosDescripcion contiene un número en lugar de texto
+        if (gasto.otrosDescripcion && !isNaN(gasto.otrosDescripcion)) {
+            console.log('Corrigiendo gasto corrupto:', gasto.id);
+            
+            // Mover el valor numérico a otrosCantidad
+            gasto.otrosCantidad = parseFloat(gasto.otrosDescripcion) || 0;
+            gasto.otrosDescripcion = ''; // Limpiar descripción
+            
+            // Recalcular total
+            gasto.totalGastos = (gasto.petroleo || 0) + (gasto.otrosCantidad || 0);
+            
+            fixed = true;
+        }
+        
+        // Si otrosCantidad está vacío pero otrosDescripcion tiene texto
+        if (gasto.otrosDescripcion && !gasto.otrosCantidad) {
+            gasto.otrosCantidad = 0;
+        }
+        
+        // Asegurar que todos los campos numéricos sean números
+        gasto.petroleo = parseFloat(gasto.petroleo) || 0;
+        gasto.otrosCantidad = parseFloat(gasto.otrosCantidad) || 0;
+        gasto.totalGastos = parseFloat(gasto.totalGastos) || 0;
+    });
+    
+    if (fixed) {
+        // Guardar datos corregidos
+        localStorage.setItem('gastos', JSON.stringify(gastos));
+        console.log('✅ Datos de gastos corregidos y guardados');
+        
+        // Recargar la pantalla actual si estamos viendo reportes
+        if (document.getElementById('orders-viewer').classList.contains('active')) {
+            loadOrdersViewer();
+        } else if (document.getElementById('reports').classList.contains('active')) {
+            loadWeeklyReport();
+        }
+    }
+}
+
+// Ejecutar corrección automáticamente al cargar
+setTimeout(() => {
+    fixCorruptedGastosData();
+}, 3000);
 
 // ==================== FIN DE NUEVAS FUNCIONES ====================

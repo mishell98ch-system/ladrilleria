@@ -324,15 +324,13 @@ body {
     border-collapse: collapse;
     margin-top: 20px;
     font-size: 12px;
-    overflow-x: auto;
-    display: block;
 }
 
 .results-table thead,
 .results-table tbody {
     display: table;
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .results-table th,
@@ -437,15 +435,13 @@ body {
     border-collapse: collapse;
     font-size: 11px;
     margin-top: 20px;
-    overflow-x: auto;
-    display: block;
 }
 
 .view-orders-table thead,
 .view-orders-table tbody {
     display: table;
     width: 100%;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .view-orders-table th,
@@ -656,6 +652,22 @@ body {
     .report-actions {
         flex-direction: column;
     }
+    
+    /* Hacer tablas scrolleables horizontalmente en tablets */
+    #search-results-table,
+    #weekly-report-table,
+    #orders-viewer-content {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+        width: 100%;
+    }
+    
+    /* Asegurar que las tablas mantengan su ancho mínimo */
+    .results-table,
+    .view-orders-table {
+        min-width: 600px;
+    }
 }
 
 /* Responsive Design - Mobile */
@@ -741,9 +753,18 @@ body {
 
     /* Hacer tablas scrolleables horizontalmente en mobile */
     #search-results-table,
-    #weekly-report-table {
+    #weekly-report-table,
+    #orders-viewer-content {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        display: block;
+        width: 100%;
+    }
+    
+    /* Asegurar que las tablas mantengan su ancho mínimo */
+    .results-table,
+    .view-orders-table {
+        min-width: 600px;
     }
 }
 

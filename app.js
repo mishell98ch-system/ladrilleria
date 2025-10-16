@@ -703,12 +703,10 @@ function loadOrdersViewer() {
                     <tr>
                         <th>ID</th>
                         <th>Fecha</th>
-                        <th>Hora</th>
                         <th>Chofer</th>
                         <th>Día</th>
                         <th>Cantidad</th>
                         <th>Tipo Ladrillo</th>
-                        <th>Precio Unit.</th>
                         <th>Precio Millar</th>
                         <th>Total</th>
                         <th>Forma Pago</th>
@@ -725,12 +723,10 @@ function loadOrdersViewer() {
                 <tr>
                     <td>${order.id}</td>
                     <td>${order.fecha}</td>
-                    <td>${order.hora}</td>
                     <td>${order.chofer}</td>
                     <td>${order.dia}</td>
                     <td>${order.cantidad}</td>
                     <td>${order.tipoLadrillo}</td>
-                    <td>${order.precioUnidad || '0.00'}</td>
                     <td>${order.precioMillar || '0.00'}</td>
                     <td>S/${parseFloat(order.total || 0).toFixed(2)}</td>
                     <td>${order.formaPago}</td>
@@ -753,7 +749,6 @@ function loadOrdersViewer() {
                     <tr>
                         <th>ID</th>
                         <th>Fecha</th>
-                        <th>Hora</th>
                         <th>Chofer</th>
                         <th>Día</th>
                         <th>Petroleo (S/.)</th>
@@ -770,7 +765,6 @@ function loadOrdersViewer() {
                 <tr>
                     <td>${gasto.id}</td>
                     <td>${gasto.fecha}</td>
-                    <td>${gasto.hora}</td>
                     <td>${gasto.chofer}</td>
                     <td>${gasto.dia}</td>
                     <td>S/${gasto.petroleo.toFixed(2)}</td>
@@ -1184,11 +1178,11 @@ function testLogo() {
     const img = new Image();
     img.onload = function() {
         console.log('✅ Logo encontrado y cargado correctamente');
-        alert('Logo encontrado correctamente. Debería aparecer en la página.');
+        // Mensaje eliminado - logo carga correctamente sin alerta
     };
     img.onerror = function() {
         console.log('❌ Error: No se puede cargar logo.png');
-        alert('Error: No se puede cargar el logo. Verifica que:\n1. El archivo se llame exactamente "logo.png"\n2. Esté en la misma carpeta que el HTML\n3. El archivo no esté corrupto');
+        // Solo mostrar error en consola, sin alertas molestas
     };
     img.src = 'logo.png';
 }

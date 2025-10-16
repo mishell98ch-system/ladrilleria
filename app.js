@@ -1952,20 +1952,81 @@ window.addEventListener('load', function() {
 });
 
 // Función para iniciar auto-sync
-function startAutoSync() {
+async function startAutoSync() {
     if (autoSyncInterval) {
         clearInterval(autoSyncInterval);
     }
     
+    // PRIMERO: Descargar datos de la nube al iniciar
+    await syncFromCloudQuietly();
+    
+    // LUEGO: Configurar sincronización periódica para subir cambios
     autoSyncInterval = setInterval(() => {
         syncToCloudQuietly();
     }, 5 * 60 * 1000); // Cada 5 minutos
-    
-    // Sincronizar inmediatamente
-    syncToCloudQuietly();
 }
 
-// Sincronizar silenciosamente (completamente invisible)
+// Descargar datos de la nube silenciosamente al iniciar
+async function syncFromCloudQuietly() {
+    if (!firebaseConfig) return;
+    
+    try {
+        const url = firebaseConfig.databaseURL + '/ladrilleria.json';
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            console.log('No hay datos en la nube o error al descargar');
+            return;
+        }
+        
+        const data = await response.json();
+        
+        // Si no hay datos en la nube, no hacer nada
+        if (!data || !data.orders || !data.gastos) {
+            console.log('No hay datos en Firebase todavía');
+            return;
+        }
+        
+        // Combinar datos: Firebase tiene prioridad pero preservar datos locales nuevos
+        const cloudOrders = data.orders || [];
+        const cloudGastos = data.gastos || [];
+        
+        // Crear un mapa de IDs para evitar duplicados
+        const orderIds = new Set(cloudOrders.map(o => o.id));
+        const gastoIds = new Set(cloudGastos.map(g => g.id));
+        
+        // Agregar datos locales que no estén en la nube
+        orders.forEach(order => {
+            if (!orderIds.has(order.id)) {
+                cloudOrders.push(order);
+            }
+        });
+        
+        gastos.forEach(gasto => {
+            if (!gastoIds.has(gasto.id)) {
+                cloudGastos.push(gasto);
+            }
+        });
+        
+        // Actualizar datos locales con los combinados
+        orders = cloudOrders;
+        gastos = cloudGastos;
+        
+        // Guardar en localStorage
+        localStorage.setItem('orders', JSON.stringify(orders));
+        localStorage.setItem('gastos', JSON.stringify(gastos));
+        
+        console.log('✅ Datos sincronizados desde la nube:', orders.length, 'pedidos,', gastos.length, 'gastos');
+        
+        // Subir datos combinados de vuelta a la nube
+        await syncToCloudQuietly();
+        
+    } catch (error) {
+        console.error('Error al descargar de la nube:', error);
+    }
+}
+
+// Sincronizar silenciosamente (subir a la nube)
 async function syncToCloudQuietly() {
     if (!firebaseConfig) return;
     
@@ -1988,11 +2049,11 @@ async function syncToCloudQuietly() {
         
         // Sincronización exitosa (silenciosa, sin notificaciones)
         if (response.ok) {
-            console.log('Datos sincronizados en la nube');
+            console.log('✅ Datos subidos a la nube:', orders.length, 'pedidos,', gastos.length, 'gastos');
         }
     } catch (error) {
         // Error silencioso, solo en consola
-        console.error('Error en sincronización:', error);
+        console.error('Error al subir a la nube:', error);
     }
 }
 

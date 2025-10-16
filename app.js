@@ -1250,11 +1250,26 @@ function resetSystem() {
     console.log('✅ Sistema reiniciado');
 }
 
+// Función para debuggear fechas
+function debugFechas() {
+    console.log('=== DEBUG FECHAS ===');
+    console.log('Pedidos:');
+    orders.forEach(order => {
+        console.log('- Fecha:', order.fecha, 'Chofer:', order.chofer);
+    });
+    console.log('Gastos:');
+    gastos.forEach(gasto => {
+        console.log('- Fecha:', gasto.fecha, 'Chofer:', gasto.chofer);
+    });
+    console.log('Fecha actual:', new Date().toLocaleDateString());
+}
+
 // Hacer funciones disponibles globalmente para debug
 window.testOrderFlow = testOrderFlow;
 window.resetSystem = resetSystem;
 window.debugOrderForm = debugOrderForm;
 window.fixCorruptedGastosData = fixCorruptedGastosData;
+window.debugFechas = debugFechas;
 
 // ==================== NUEVAS FUNCIONES PARA REPORTES AVANZADOS ====================
 
@@ -1447,21 +1462,61 @@ function generateMonthReport() {
 
 // Función auxiliar para parsear fechas en formato local
 function parseDateString(dateStr) {
-    // Formato esperado: dd/mm/yyyy o similar
+    console.log('Intentando parsear fecha:', dateStr);
+    
+    // Probar diferentes formatos
+    let date = null;
+    
     const parts = dateStr.split('/');
     if (parts.length === 3) {
-        // Asumiendo formato dd/mm/yyyy
-        const day = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1; // Los meses en JS van de 0-11
+        const part1 = parseInt(parts[0]);
+        const part2 = parseInt(parts[1]);
         const year = parseInt(parts[2]);
         
-        const date = new Date(year, month, day);
-        console.log('Parseando fecha:', dateStr, '->', date.toLocaleDateString());
-        return date;
+        // Detectar formato basado en los valores
+        // Si el primer número es > 12, entonces es dd/mm/yyyy
+        if (part1 > 12) {
+            // Formato dd/mm/yyyy
+            const day = part1;
+            const month = part2 - 1; // Los meses en JS van de 0-11
+            date = new Date(year, month, day);
+            console.log('✅ Formato dd/mm/yyyy detectado:', dateStr, '->', date.toLocaleDateString());
+            return date;
+        }
+        // Si el segundo número es > 12, entonces es mm/dd/yyyy
+        else if (part2 > 12) {
+            // Formato mm/dd/yyyy
+            const month = part1 - 1;
+            const day = part2;
+            date = new Date(year, month, day);
+            console.log('✅ Formato mm/dd/yyyy detectado:', dateStr, '->', date.toLocaleDateString());
+            return date;
+        }
+        // Si ambos son <= 12, asumir mm/dd/yyyy (formato americano común)
+        else {
+            // Formato mm/dd/yyyy
+            const month = part1 - 1;
+            const day = part2;
+            date = new Date(year, month, day);
+            console.log('✅ Formato mm/dd/yyyy asumido:', dateStr, '->', date.toLocaleDateString());
+            return date;
+        }
     }
+    
+    // Formato ISO string
+    try {
+        date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+            console.log('✅ Formato ISO:', dateStr, '->', date.toLocaleDateString());
+            return date;
+        }
+    } catch (e) {
+        // Continuar
+    }
+    
     // Si no se puede parsear, retornar fecha inválida
-    console.log('Error parseando fecha:', dateStr);
-    return new Date(dateStr);
+    console.log('❌ Error parseando fecha:', dateStr);
+    return new Date('invalid');
 }
 
 // Generar reporte personalizado

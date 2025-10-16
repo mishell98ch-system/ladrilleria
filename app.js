@@ -1079,25 +1079,10 @@ function printReport() {
     printWindow.print();
 }
 
-// Función para mostrar/ocultar botón de limpiar datos
+// Función para mostrar/ocultar botón de limpiar datos (DESACTIVADA)
 function toggleClearDataButton() {
-    const clearButtonContainer = document.getElementById('clear-data-container');
-    
-    if (!clearButtonContainer) return;
-    
-    // Solo mostrar si hay datos (más de 0 registros)
-    const totalRecords = orders.length + gastos.length;
-    
-    if (totalRecords > 0) {
-        clearButtonContainer.style.display = 'block';
-        // Actualizar contador
-        const countElement = document.getElementById('local-count');
-        if (countElement) {
-            countElement.textContent = totalRecords;
-        }
-    } else {
-        clearButtonContainer.style.display = 'none';
-    }
+    // Función desactivada - el botón está oculto permanentemente
+    return;
 }
 
 // Función para limpiar todos los datos
@@ -1978,8 +1963,8 @@ function loadCloudSyncScreen() {
     // Actualizar contadores
     document.getElementById('local-count').textContent = orders.length + gastos.length;
     
-    // Verificar si debe mostrar el botón de limpiar
-    toggleClearDataButton();
+    // Verificar si debe mostrar el botón de limpiar (DESACTIVADO)
+    // toggleClearDataButton();
     
     // Verificar auto-sync
     const autoSync = localStorage.getItem('autoSyncEnabled');
@@ -2212,8 +2197,8 @@ function showCloudMessage(message, type) {
 const originalSaveOrder = saveOrder;
 saveOrder = function() {
     originalSaveOrder();
-    // Actualizar botón de limpiar
-    toggleClearDataButton();
+    // Actualizar botón de limpiar (DESACTIVADO)
+    // toggleClearDataButton();
     // Sincronizar automáticamente después de guardar
     setTimeout(() => syncToCloudQuietly(), 1000);
 };
@@ -2221,8 +2206,8 @@ saveOrder = function() {
 const originalSaveGastos = saveGastos;
 saveGastos = function() {
     originalSaveGastos();
-    // Actualizar botón de limpiar
-    toggleClearDataButton();
+    // Actualizar botón de limpiar (DESACTIVADO)
+    // toggleClearDataButton();
     // Sincronizar automáticamente después de guardar
     setTimeout(() => syncToCloudQuietly(), 1000);
 };

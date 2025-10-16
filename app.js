@@ -2251,48 +2251,93 @@ function enableAutoSync() {
 function fixCorruptedGastosData() {
     let fixed = false;
     
-    gastos.forEach(gasto => {
+    console.log('🔍 Revisando', gastos.length, 'gastos para corrección...');
+    
+    gastos.forEach((gasto, index) => {
+        let gastoFixed = false;
+        
+        // Debug: mostrar estado actual
+        console.log(`Gasto ${index + 1}:`, {
+            id: gasto.id,
+            petroleo: gasto.petroleo,
+            otrosDescripcion: gasto.otrosDescripcion,
+            otrosCantidad: gasto.otrosCantidad,
+            totalGastos: gasto.totalGastos
+        });
+        
         // Si otrosDescripcion contiene un número en lugar de texto
         if (gasto.otrosDescripcion && !isNaN(gasto.otrosDescripcion)) {
-            console.log('Corrigiendo gasto corrupto:', gasto.id);
+            console.log('🔧 Corrigiendo: otrosDescripcion tiene número:', gasto.otrosDescripcion);
             
             // Mover el valor numérico a otrosCantidad
             gasto.otrosCantidad = parseFloat(gasto.otrosDescripcion) || 0;
             gasto.otrosDescripcion = ''; // Limpiar descripción
             
-            // Recalcular total
-            gasto.totalGastos = (gasto.petroleo || 0) + (gasto.otrosCantidad || 0);
-            
-            fixed = true;
+            gastoFixed = true;
+        }
+        
+        // Si otrosDescripcion contiene "S/" o similar, limpiarlo
+        if (gasto.otrosDescripcion && gasto.otrosDescripcion.includes('S/')) {
+            console.log('🔧 Corrigiendo: otrosDescripcion contiene "S/":', gasto.otrosDescripcion);
+            gasto.otrosDescripcion = '';
+            gastoFixed = true;
         }
         
         // Si otrosCantidad está vacío pero otrosDescripcion tiene texto
-        if (gasto.otrosDescripcion && !gasto.otrosCantidad) {
+        if (gasto.otrosDescripcion && gasto.otrosDescripcion.trim() !== '' && !gasto.otrosCantidad) {
             gasto.otrosCantidad = 0;
         }
         
         // Asegurar que todos los campos numéricos sean números
+        const petroleoOriginal = gasto.petroleo;
+        const otrosCantidadOriginal = gasto.otrosCantidad;
+        
         gasto.petroleo = parseFloat(gasto.petroleo) || 0;
         gasto.otrosCantidad = parseFloat(gasto.otrosCantidad) || 0;
-        gasto.totalGastos = parseFloat(gasto.totalGastos) || 0;
+        
+        // Recalcular total
+        const nuevoTotal = gasto.petroleo + gasto.otrosCantidad;
+        if (gasto.totalGastos !== nuevoTotal) {
+            console.log('🔧 Recalculando total:', gasto.totalGastos, '->', nuevoTotal);
+            gasto.totalGastos = nuevoTotal;
+            gastoFixed = true;
+        }
+        
+        if (gastoFixed) {
+            console.log('✅ Gasto corregido:', gasto.id);
+            fixed = true;
+        }
     });
     
     if (fixed) {
         // Guardar datos corregidos
         localStorage.setItem('gastos', JSON.stringify(gastos));
-        console.log('✅ Datos de gastos corregidos y guardados');
+        console.log('✅ Datos de gastos corregidos y guardados en localStorage');
+        
+        // También subir a Firebase si está configurado
+        if (firebaseConfig) {
+            syncToCloudQuietly();
+        }
         
         // Recargar la pantalla actual si estamos viendo reportes
         if (document.getElementById('orders-viewer').classList.contains('active')) {
+            console.log('🔄 Recargando visualizador de pedidos...');
             loadOrdersViewer();
         } else if (document.getElementById('reports').classList.contains('active')) {
+            console.log('🔄 Recargando reporte general...');
             loadWeeklyReport();
         }
+        
+        // Mostrar mensaje de éxito
+        alert('✅ Datos corregidos automáticamente. Los reportes ahora deberían mostrar la información correcta.');
+    } else {
+        console.log('ℹ️ No se encontraron datos corruptos para corregir');
     }
 }
 
 // Ejecutar corrección automáticamente al cargar
 setTimeout(() => {
+    console.log('🔧 Ejecutando corrección automática de datos...');
     fixCorruptedGastosData();
 }, 3000);
 

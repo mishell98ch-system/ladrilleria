@@ -336,8 +336,10 @@ body {
 .results-table th,
 .results-table td {
     border: 1px solid var(--border-color);
-    padding: 8px;
+    padding: 8px 12px;
     text-align: left;
+    white-space: nowrap;
+    min-width: 80px;
 }
 
 .results-table th {
@@ -447,8 +449,10 @@ body {
 .view-orders-table th,
 .view-orders-table td {
     border: 1px solid var(--border-color);
-    padding: 6px;
+    padding: 6px 10px;
     text-align: center;
+    white-space: nowrap;
+    min-width: 70px;
 }
 
 .view-orders-table th {
@@ -646,7 +650,9 @@ body {
     .results-table td,
     .view-orders-table th,
     .view-orders-table td {
-        padding: 4px 2px;
+        padding: 4px 6px;
+        font-size: 10px;
+        min-width: 60px;
     }
 
     .report-actions {
@@ -663,10 +669,26 @@ body {
         width: 100%;
     }
     
-    /* Asegurar que las tablas mantengan su ancho mínimo */
+    /* Asegurar que las tablas mantengan su ancho mínimo y columnas consistentes */
     .results-table,
     .view-orders-table {
         min-width: 600px;
+    }
+    
+    /* Anchos específicos para columnas importantes en tablets */
+    .results-table th:nth-child(1),
+    .results-table td:nth-child(1) {
+        min-width: 120px; /* Vendedor/Nombre */
+    }
+    
+    .view-orders-table th:nth-child(1),
+    .view-orders-table td:nth-child(1) {
+        min-width: 90px; /* ID */
+    }
+    
+    .view-orders-table th:nth-child(2),
+    .view-orders-table td:nth-child(2) {
+        min-width: 80px; /* Fecha */
     }
 }
 
@@ -743,7 +765,9 @@ body {
     .results-table td,
     .view-orders-table th,
     .view-orders-table td {
-        padding: 3px 1px;
+        padding: 3px 4px;
+        font-size: 9px;
+        min-width: 50px;
     }
 
     .delete-button {
@@ -761,10 +785,26 @@ body {
         width: 100%;
     }
     
-    /* Asegurar que las tablas mantengan su ancho mínimo */
+    /* Asegurar que las tablas mantengan su ancho mínimo y columnas consistentes */
     .results-table,
     .view-orders-table {
         min-width: 600px;
+    }
+    
+    /* Anchos específicos para columnas importantes */
+    .results-table th:nth-child(1),
+    .results-table td:nth-child(1) {
+        min-width: 100px; /* Vendedor/Nombre */
+    }
+    
+    .view-orders-table th:nth-child(1),
+    .view-orders-table td:nth-child(1) {
+        min-width: 80px; /* ID */
+    }
+    
+    .view-orders-table th:nth-child(2),
+    .view-orders-table td:nth-child(2) {
+        min-width: 70px; /* Fecha */
     }
 }
 

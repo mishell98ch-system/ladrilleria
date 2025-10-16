@@ -66,10 +66,10 @@ function showGastosForm() {
 
 // Actualizar título dinámico de gastos
 function updateGastosTitle() {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('es-ES');
+    const selectedDate = getDateForDay(currentDay);
+    const formattedDate = selectedDate.toLocaleDateString('es-ES');
     
-    document.getElementById('gastos-title').textContent = `Gastos de ${currentChofer} - ${formattedDate}`;
+    document.getElementById('gastos-title').textContent = `Gastos de ${currentChofer} - ${currentDay} - ${formattedDate}`;
 }
 
 // Selección de chofer
@@ -195,10 +195,45 @@ function deleteOrder(orderId) {
     }
 }
 
+// Función para calcular la fecha del día seleccionado en la semana actual
+function getDateForDay(dayName) {
+    const today = new Date();
+    const currentDayOfWeek = today.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+    
+    // Mapeo de nombres de días a números
+    const dayMap = {
+        'LUNES': 1,
+        'MARTES': 2,
+        'MIERCOLES': 3,
+        'MIÉRCOLES': 3,
+        'JUEVES': 4,
+        'VIERNES': 5,
+        'SABADO': 6,
+        'SÁBADO': 6
+    };
+    
+    const targetDay = dayMap[dayName];
+    
+    // Calcular la diferencia de días
+    let diff = targetDay - currentDayOfWeek;
+    
+    // Si el día seleccionado es domingo o ya pasó en la semana, tomar el de la semana actual
+    // (asumimos que la semana va de lunes a sábado)
+    if (currentDayOfWeek === 0) { // Si hoy es domingo
+        diff = targetDay - 7; // Tomar la semana anterior
+    }
+    
+    // Crear nueva fecha
+    const resultDate = new Date(today);
+    resultDate.setDate(today.getDate() + diff);
+    
+    return resultDate;
+}
+
 // Actualizar título dinámico del pedido
 function updateOrderTitle() {
-    const today = new Date();
-    const formattedDate = today.toLocaleDateString('es-ES');
+    const selectedDate = getDateForDay(currentDay);
+    const formattedDate = selectedDate.toLocaleDateString('es-ES');
     
     document.getElementById('order-title').textContent = `Pedido de ${currentChofer} / ${currentDay} / ${formattedDate}`;
 }
@@ -329,12 +364,13 @@ function saveOrder() {
     }
 
     const now = new Date();
+    const orderDate = getDateForDay(currentDay); // Usar la fecha del día seleccionado
     const order = {
         id: Date.now(),
         chofer: currentChofer,
         dia: currentDay,
-        fecha: now.toLocaleDateString(),
-        fechaISO: now.toISOString(),
+        fecha: orderDate.toLocaleDateString('es-ES'),
+        fechaISO: orderDate.toISOString(),
         hora: now.toLocaleTimeString(),
         cantidad: cantidad,
         tipoLadrillo: tipoLadrillo,
@@ -491,12 +527,13 @@ function saveGastos() {
     }
 
     const now = new Date();
+    const gastoDate = getDateForDay(currentDay); // Usar la fecha del día seleccionado
     const gasto = {
         id: Date.now(),
         chofer: currentChofer,
         dia: currentDay,
-        fecha: now.toLocaleDateString(),
-        fechaISO: now.toISOString(),
+        fecha: gastoDate.toLocaleDateString('es-ES'),
+        fechaISO: gastoDate.toISOString(),
         hora: now.toLocaleTimeString(),
         petroleo: parseFloat(petroleo) || 0,
         otrosDescripcion: otrosDescripcion,

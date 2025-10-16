@@ -376,6 +376,17 @@
                         Tus datos se guardan en la nube. Ahora puedes acceder desde cualquier dispositivo usando la misma configuración.
                     </p>
                 </div>
+
+                <!-- Botón de Limpiar Datos (se oculta automáticamente cuando no hay datos) -->
+                <div id="clear-data-container" style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-top: 20px; border: 2px solid #ffc107; display: none;">
+                    <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ Zona de Limpieza</h4>
+                    <p style="margin: 0 0 15px 0; color: #666; font-size: 14px;">
+                        Usa esto solo si quieres empezar de cero (elimina TODOS los pedidos y gastos)
+                    </p>
+                    <button class="action-button" onclick="clearAllData()" style="width: 100%; background: #f44336; font-size: 16px;">
+                        🗑️ Limpiar Todos los Datos
+                    </button>
+                </div>
             </div>
 
             <div style="text-align: center; margin-top: 30px;">

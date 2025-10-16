@@ -188,6 +188,9 @@ function deleteOrder(orderId) {
         localStorage.setItem('orders', JSON.stringify(orders));
         alert('Pedido eliminado exitosamente');
         
+        // Actualizar botón de limpiar
+        toggleClearDataButton();
+        
         // Recargar búsqueda actual
         performSearch();
     } else {
@@ -1076,32 +1079,89 @@ function printReport() {
     printWindow.print();
 }
 
-// Función para limpiar todos los datos (DESACTIVADA PARA PRODUCCIÓN)
-/*
-function clearAllData() {
-    if (confirm('¿Está seguro que desea eliminar TODOS los pedidos y gastos?\n\nEsta acción no se puede deshacer.')) {
-        localStorage.removeItem('orders');
-        localStorage.removeItem('gastos');
-        
-        // Reinicializar variables
-        orders = [];
-        gastos = [];
-        
-        alert('Todos los datos han sido eliminados correctamente.\n\nEl sistema está listo para usar desde cero.');
-        
-        // Si está en pantalla de reportes, recargar
-        if (document.getElementById('reports').classList.contains('active')) {
-            loadWeeklyReport();
+// Función para mostrar/ocultar botón de limpiar datos
+function toggleClearDataButton() {
+    const clearButtonContainer = document.getElementById('clear-data-container');
+    
+    if (!clearButtonContainer) return;
+    
+    // Solo mostrar si hay datos (más de 0 registros)
+    const totalRecords = orders.length + gastos.length;
+    
+    if (totalRecords > 0) {
+        clearButtonContainer.style.display = 'block';
+        // Actualizar contador
+        const countElement = document.getElementById('local-count');
+        if (countElement) {
+            countElement.textContent = totalRecords;
         }
-        
-        // Si está en pantalla de búsqueda, limpiar resultados
-        if (document.getElementById('search').classList.contains('active')) {
-            document.getElementById('search-results-summary').style.display = 'none';
-            document.getElementById('search-results-table').style.display = 'none';
-        }
+    } else {
+        clearButtonContainer.style.display = 'none';
     }
 }
-*/
+
+// Función para limpiar todos los datos
+async function clearAllData() {
+    const confirmMessage = 
+        '⚠️ ADVERTENCIA: ELIMINACIÓN TOTAL DE DATOS ⚠️\n\n' +
+        '¿Estás COMPLETAMENTE SEGURO de eliminar:\n' +
+        `✓ ${orders.length} pedidos\n` +
+        `✓ ${gastos.length} gastos\n` +
+        '✓ Todos los datos locales\n' +
+        '✓ Todos los datos en Firebase (nube)\n\n' +
+        '🔴 ESTA ACCIÓN NO SE PUEDE DESHACER 🔴\n\n' +
+        'Escribe "ELIMINAR" en mayúsculas para confirmar:';
+    
+    const userInput = prompt(confirmMessage);
+    
+    if (userInput === 'ELIMINAR') {
+        try {
+            // 1. Limpiar datos locales
+            localStorage.removeItem('orders');
+            localStorage.removeItem('gastos');
+            
+            // 2. Reinicializar variables
+            orders = [];
+            gastos = [];
+            
+            // 3. Limpiar Firebase si está configurado
+            if (firebaseConfig && firebaseConfig.databaseURL) {
+                showCloudMessage('🔄 Eliminando datos de Firebase...', 'info');
+                
+                const url = firebaseConfig.databaseURL + '/ladrilleria.json';
+                const response = await fetch(url, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showCloudMessage('✅ Datos eliminados exitosamente de Firebase', 'success');
+                } else {
+                    showCloudMessage('⚠️ Error al eliminar datos de Firebase', 'error');
+                }
+            }
+            
+            alert('✅ TODOS los datos han sido eliminados correctamente.\n\nEl sistema está completamente limpio y listo para usar desde cero.');
+            
+            // 4. Ocultar botón de limpiar (ya no hay datos)
+            toggleClearDataButton();
+            
+            // 5. Recargar pantalla actual si es necesario
+            if (document.getElementById('reports').classList.contains('active')) {
+                loadWeeklyReport();
+            }
+            
+            if (document.getElementById('search').classList.contains('active')) {
+                document.getElementById('search-results-summary').style.display = 'none';
+                document.getElementById('search-results-table').style.display = 'none';
+            }
+            
+        } catch (error) {
+            alert('❌ Error al eliminar datos: ' + error.message);
+        }
+    } else if (userInput !== null) {
+        alert('❌ Confirmación incorrecta. Los datos NO fueron eliminados.\n\nDebes escribir exactamente "ELIMINAR" en mayúsculas.');
+    }
+}
 
 // Limpiar datos de prueba - EJECUTAR UNA SOLA VEZ (DESACTIVADO)
 // clearAllData();
@@ -1918,6 +1978,9 @@ function loadCloudSyncScreen() {
     // Actualizar contadores
     document.getElementById('local-count').textContent = orders.length + gastos.length;
     
+    // Verificar si debe mostrar el botón de limpiar
+    toggleClearDataButton();
+    
     // Verificar auto-sync
     const autoSync = localStorage.getItem('autoSyncEnabled');
     if (autoSync === 'true') {
@@ -2149,6 +2212,8 @@ function showCloudMessage(message, type) {
 const originalSaveOrder = saveOrder;
 saveOrder = function() {
     originalSaveOrder();
+    // Actualizar botón de limpiar
+    toggleClearDataButton();
     // Sincronizar automáticamente después de guardar
     setTimeout(() => syncToCloudQuietly(), 1000);
 };
@@ -2156,6 +2221,8 @@ saveOrder = function() {
 const originalSaveGastos = saveGastos;
 saveGastos = function() {
     originalSaveGastos();
+    // Actualizar botón de limpiar
+    toggleClearDataButton();
     // Sincronizar automáticamente después de guardar
     setTimeout(() => syncToCloudQuietly(), 1000);
 };
